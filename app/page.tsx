@@ -7,15 +7,17 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// 환경 변수 연동
-const OFFICE_CODE = process.env.NEXT_PUBLIC_OFFICE_CODE || '';
-const SCHOOL_CODE = process.env.NEXT_PUBLIC_SCHOOL_CODE || '';
+const OFFICE_CODE = process.env.NEXT_PUBLIC_OFFICE_CODE || 'C10';
+const SCHOOL_CODE = process.env.NEXT_PUBLIC_SCHOOL_CODE || '7150404';
 
-// API 호출 최적화를 위한 인메모리 캐시 객체
 const mealCache = new Map<string, { type: string, menu: string }[]>();
 
+type ViewType = 'home' | 'timetable' | 'notice-list' | 'admin' | 'meal-board' | 'notice-write';
+
 export default function RetroDashboard() {
-  const [view, setView] = useState<'home' | 'timetable' | 'notice-list' | 'admin' | 'meal-board'>('home');
+  const [view, setView] = useState<ViewType>('home');
+  const [prevView, setPrevView] = useState<ViewType>('home'); // 로그인 직전 화면 저장용
+  
   const [studentId, setStudentId] = useState('');
   const [viewPath, setViewPath] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
@@ -31,14 +33,8 @@ export default function RetroDashboard() {
   const [dailyMeals, setDailyMeals] = useState<{ type: string, menu: string }[]>([]);
   const [isMealLoading, setIsMealLoading] = useState(false);
 
-  // 1. 당일 중식 전광판용 정보 가져오기
   const fetchMeal = async () => {
     try {
-      if (!OFFICE_CODE || !SCHOOL_CODE) {
-        setMeal("환경 변수(학교 코드)가 설정되지 않았습니다.");
-        return;
-      }
-
       const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
       const res = await fetch(
         `https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&ATPT_OFCDC_SC_CODE=${OFFICE_CODE}&SD_SCHUL_CODE=${SCHOOL_CODE}&MLSV_YMD=${today}`
@@ -57,16 +53,9 @@ export default function RetroDashboard() {
     }
   };
 
-  // 2. 선택한 날짜의 전체 급식 정보 가져오기 (캐싱 적용)
   const fetchDailyMeals = async (dateStr: string) => {
-    if (!OFFICE_CODE || !SCHOOL_CODE) {
-      setDailyMeals([{ type: "ERROR", menu: "환경 변수가 설정되지 않았습니다." }]);
-      return;
-    }
-
     const formattedDate = dateStr.replace(/-/g, '');
 
-    // 캐시 확인 로직: 이미 조회한 날짜라면 캐시된 데이터를 사용하고 API 호출 생략
     if (mealCache.has(formattedDate)) {
       setDailyMeals(mealCache.get(formattedDate) || []);
       return;
@@ -93,7 +82,6 @@ export default function RetroDashboard() {
         mealsToCache = [{ type: "INFO", menu: "해당 날짜의 급식 정보가 존재하지 않습니다." }];
       }
 
-      // API 응답 결과를 캐시에 저장
       mealCache.set(formattedDate, mealsToCache);
       setDailyMeals(mealsToCache);
 
@@ -130,6 +118,17 @@ export default function RetroDashboard() {
 
   const resetView = () => { setView('home'); setViewPath(''); setStudentId(''); setClickCount(0); };
 
+  const handleAdminTrigger = () => {
+    setClickCount(prev => {
+      if (prev + 1 >= 5) {
+        setPrevView(view); // 현재 뷰 저장
+        setView('admin');
+        return 0;
+      }
+      return prev + 1;
+    });
+  };
+
   return (
     <div className="min-h-screen bg-[#f0e7db] text-[#222] font-mono p-4 md:p-8">
       {/* 상단 전광판 */}
@@ -143,7 +142,10 @@ export default function RetroDashboard() {
 
       <header className="max-w-4xl mx-auto border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-12 p-4 flex justify-between items-center">
         <h1 className="text-xl md:text-2xl font-black uppercase cursor-pointer" onClick={resetView}>📟 2026 해강고 2학년 10반</h1>
-        <div className="bg-yellow-300 border-2 border-black px-3 py-1 font-bold text-xs">SYSTEM_ONLINE</div>
+        <div className="bg-yellow-300 border-2 border-black px-3 py-1 font-bold text-xs flex items-center gap-2">
+          SYSTEM_ONLINE
+          {isAdminAuthenticated && <span className="bg-red-500 text-white px-1 text-[10px]">ADMIN</span>}
+        </div>
       </header>
 
       <main className="max-w-4xl mx-auto">
@@ -207,8 +209,16 @@ export default function RetroDashboard() {
           </section>
         ) : view === 'notice-list' ? (
           <section className="max-w-2xl mx-auto bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-            <div className="bg-yellow-400 text-black px-4 py-1 border-b-4 border-black font-bold text-xs tracking-widest">BULLETIN_BOARD.EXE</div>
+            <div className="bg-yellow-400 text-black px-4 py-1 border-b-4 border-black flex justify-between font-bold text-xs tracking-widest">
+              <span>BULLETIN_BOARD.EXE</span>
+              <button onClick={resetView}>X</button>
+            </div>
             <div className="p-6 space-y-4">
+              {isAdminAuthenticated && (
+                <button onClick={() => setView('notice-write')} className="w-full bg-blue-600 text-white py-3 font-black border-4 border-black mb-4 hover:bg-blue-700">
+                  WRITE_NOTICE 📝
+                </button>
+              )}
               {notices.map((n) => (
                 <div key={n.id} className={`p-4 border-2 border-black ${n.is_important ? 'bg-yellow-100' : 'bg-white'}`}>
                   <div className="flex justify-between items-center mb-1">
@@ -216,10 +226,31 @@ export default function RetroDashboard() {
                     {isAdminAuthenticated && <button onClick={()=>deleteNotice(n.id)} className="text-red-500 text-xs font-bold underline">DELETE</button>}
                   </div>
                   <h4 className="text-lg font-black">{n.is_important ? '🔥 ' : ''}{n.title}</h4>
-                  <p className="text-sm mt-2">{n.content}</p>
+                  <p className="text-sm mt-2 whitespace-pre-wrap">{n.content}</p>
                 </div>
               ))}
               <button onClick={resetView} className="w-full bg-black text-white py-3 font-bold mt-4">BACK_TO_HOME</button>
+            </div>
+          </section>
+        ) : view === 'notice-write' ? (
+          <section className="max-w-md mx-auto bg-white border-4 border-black p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
+            <div className="space-y-4 text-left">
+              <h2 className="text-xl font-black italic underline">POST_NOTICE</h2>
+              <input id="n_title" type="text" className="w-full border-2 border-black p-2 font-bold" placeholder="제목" />
+              <textarea id="n_content" className="w-full border-2 border-black p-2 h-32" placeholder="내용" />
+              <label className="flex items-center space-x-2 bg-yellow-100 p-2 border-2 border-black border-dashed cursor-pointer">
+                <input type="checkbox" checked={isImportant} onChange={(e)=>setIsImportant(e.target.checked)} className="w-5 h-5 accent-black" />
+                <span className="font-bold text-xs">중요 공지 (강조 표시) 🔥</span>
+              </label>
+              <div className="flex gap-2 mt-4">
+                <button onClick={() => {
+                  const t = (document.getElementById('n_title') as HTMLInputElement).value;
+                  const c = (document.getElementById('n_content') as HTMLTextAreaElement).value;
+                  if(t && c) saveNotice(t, c);
+                  else alert('제목과 내용을 입력하세요.');
+                }} className="flex-1 bg-blue-600 text-white py-3 font-black border-4 border-black">DB_COMMIT</button>
+                <button onClick={() => setView('notice-list')} className="flex-1 bg-gray-300 text-black py-3 font-black border-4 border-black">CANCEL</button>
+              </div>
             </div>
           </section>
         ) : view === 'admin' ? (
@@ -228,23 +259,22 @@ export default function RetroDashboard() {
               <div className="space-y-4">
                 <h2 className="text-xl font-black">ADMIN_LOGIN</h2>
                 <input type="password" className="w-full border-4 border-black p-2" value={adminPassword} onChange={(e)=>setAdminPassword(e.target.value)} placeholder="PASSWORD" />
-                <button onClick={()=>{if(adminPassword==='5314')setIsAdminAuthenticated(true); else alert('Error');}} className="w-full bg-black text-white py-2 font-bold">ACCESS</button>
+                <button onClick={() => {
+                  if (adminPassword === 'Ehddus00__') {
+                    setIsAdminAuthenticated(true);
+                    setView(prevView); // 로그인 성공 시 직전 화면으로 복귀
+                    setAdminPassword('');
+                  } else {
+                    alert('ACCESS DENIED');
+                  }
+                }} className="w-full bg-black text-white py-2 font-bold border-4 border-black">ACCESS</button>
+                <button onClick={() => setView(prevView)} className="w-full text-xs underline mt-2 text-center block text-gray-500">CANCEL</button>
               </div>
             ) : (
-              <div className="space-y-4 text-left">
-                <h2 className="text-xl font-black italic underline">POST_NOTICE</h2>
-                <input id="n_title" type="text" className="w-full border-2 border-black p-2 font-bold" placeholder="제목" />
-                <textarea id="n_content" className="w-full border-2 border-black p-2 h-32" placeholder="내용" />
-                <label className="flex items-center space-x-2 bg-yellow-100 p-2 border-2 border-black border-dashed cursor-pointer">
-                  <input type="checkbox" checked={isImportant} onChange={(e)=>setIsImportant(e.target.checked)} className="w-5 h-5 accent-black" />
-                  <span className="font-bold text-xs">중요 공지 (강조 표시) 🔥</span>
-                </label>
-                <button onClick={() => {
-                  const t = (document.getElementById('n_title') as HTMLInputElement).value;
-                  const c = (document.getElementById('n_content') as HTMLTextAreaElement).value;
-                  saveNotice(t, c);
-                }} className="w-full bg-blue-600 text-white py-3 font-black border-4 border-black">DB_COMMIT</button>
-                <button onClick={()=>setIsAdminAuthenticated(false)} className="w-full text-xs underline mt-4 text-center block">LOGOUT</button>
+              <div className="space-y-4 text-center">
+                <h2 className="text-xl font-black text-blue-600">ALREADY LOGGED IN</h2>
+                <button onClick={() => setView(prevView)} className="w-full bg-black text-white py-3 font-bold border-4 border-black">RETURN_TO_PREVIOUS</button>
+                <button onClick={() => { setIsAdminAuthenticated(false); setView('home'); }} className="w-full bg-red-500 text-white py-3 font-bold border-4 border-black mt-2">LOGOUT</button>
               </div>
             )}
           </section>
@@ -255,6 +285,8 @@ export default function RetroDashboard() {
               <input type="text" className="w-full border-4 border-black p-3 font-bold" placeholder="학번 5자리" value={studentId} onChange={(e)=>setStudentId(e.target.value)} />
               <button onClick={() => { if(!studentId.trim()) alert('!'); else setViewPath(`/timetables/${studentId}.png`); }} className="w-full bg-blue-500 text-white border-4 border-black py-4 font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none transition-all">SEARCH 🔍</button>
               {viewPath && <div className="mt-6 border-t-4 border-dashed border-black pt-6"><img src={viewPath} className="border-4 border-black mb-4 w-full" onError={()=>{alert('!'); setViewPath('');}} /><a href={viewPath} download className="block w-full bg-[#00ff41] border-4 border-black py-4 font-black">SAVE_IMAGE 💾</a></div>}
+              
+              <button onClick={resetView} className="w-full bg-black text-white py-3 font-bold mt-6 border-4 border-black hover:bg-gray-800">BACK_TO_HOME</button>
             </div>
           </section>
         )}
@@ -262,7 +294,7 @@ export default function RetroDashboard() {
 
       <footer className="mt-20 text-center text-[10px] font-bold text-gray-400 pb-10">
         COPYRIGHT (C) 2026. DongT. ALL RIGHTS RESERVED
-        <span className="cursor-default select-none" onClick={() => { setClickCount(prev => { if (prev + 1 >= 5) { setView('admin'); return 0; } return prev + 1; }); }}>.</span>
+        <span className="cursor-default select-none" onClick={handleAdminTrigger}>.</span>
       </footer>
 
       <style jsx global>{`
