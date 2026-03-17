@@ -14,9 +14,18 @@ const mealCache = new Map<string, { type: string, menu: string }[]>();
 
 type ViewType = 'home' | 'timetable' | 'notice-list' | 'admin' | 'meal-board' | 'notice-write';
 
+// 로컬 시간 기준 오늘 날짜 문자열(YYYY-MM-DD)을 반환하는 함수 추가
+const getLocalDateString = () => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export default function RetroDashboard() {
   const [view, setView] = useState<ViewType>('home');
-  const [prevView, setPrevView] = useState<ViewType>('home'); // 로그인 직전 화면 저장용
+  const [prevView, setPrevView] = useState<ViewType>('home');
   
   const [studentId, setStudentId] = useState('');
   const [viewPath, setViewPath] = useState('');
@@ -29,13 +38,15 @@ export default function RetroDashboard() {
   const [loading, setLoading] = useState(true);
   const [isImportant, setIsImportant] = useState(false);
 
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  // 기본 날짜를 로컬 시간 기준으로 세팅
+  const [selectedDate, setSelectedDate] = useState(getLocalDateString());
   const [dailyMeals, setDailyMeals] = useState<{ type: string, menu: string }[]>([]);
   const [isMealLoading, setIsMealLoading] = useState(false);
 
   const fetchMeal = async () => {
     try {
-      const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
+      // 전광판 용 당일 날짜 조회 시에도 로컬 시간 기준 적용
+      const today = getLocalDateString().replace(/-/g, '');
       const res = await fetch(
         `https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&ATPT_OFCDC_SC_CODE=${OFFICE_CODE}&SD_SCHUL_CODE=${SCHOOL_CODE}&MLSV_YMD=${today}`
       );
@@ -121,7 +132,7 @@ export default function RetroDashboard() {
   const handleAdminTrigger = () => {
     setClickCount(prev => {
       if (prev + 1 >= 5) {
-        setPrevView(view); // 현재 뷰 저장
+        setPrevView(view); 
         setView('admin');
         return 0;
       }
@@ -260,9 +271,9 @@ export default function RetroDashboard() {
                 <h2 className="text-xl font-black">ADMIN_LOGIN</h2>
                 <input type="password" className="w-full border-4 border-black p-2" value={adminPassword} onChange={(e)=>setAdminPassword(e.target.value)} placeholder="PASSWORD" />
                 <button onClick={() => {
-                  if (adminPassword === 'Ehddus00__') {
+                  if (adminPassword === '5314') {
                     setIsAdminAuthenticated(true);
-                    setView(prevView); // 로그인 성공 시 직전 화면으로 복귀
+                    setView(prevView); 
                     setAdminPassword('');
                   } else {
                     alert('ACCESS DENIED');
