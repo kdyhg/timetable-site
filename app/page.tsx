@@ -7,8 +7,15 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// 환경 변수 연동
+const OFFICE_CODE = process.env.NEXT_PUBLIC_OFFICE_CODE || '';
+const SCHOOL_CODE = process.env.NEXT_PUBLIC_SCHOOL_CODE || '';
+
+// API 호출 최적화를 위한 인메모리 캐시 객체
+const mealCache = new Map<string, { type: string, menu: string }[]>();
+
 export default function RetroDashboard() {
-  const [view, setView] = useState<'home' | 'timetable' | 'notice-list' | 'admin'>('home');
+  const [view, setView] = useState<'home' | 'timetable' | 'notice-list' | 'admin' | 'meal-board'>('home');
   const [studentId, setStudentId] = useState('');
   const [viewPath, setViewPath] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
@@ -20,15 +27,19 @@ export default function RetroDashboard() {
   const [loading, setLoading] = useState(true);
   const [isImportant, setIsImportant] = useState(false);
 
-  // --- 학교 정보 설정 (여기를 본인 학교 코드로 바꾸세요!) ---
-  const OFFICE_CODE = "C10"; // 시도교육청코드 (예: 경기도 J10)
-  const SCHOOL_CODE = "7150404"; // 학교고유코드 (7자리 숫자)
-  // --------------------------------------------------
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [dailyMeals, setDailyMeals] = useState<{ type: string, menu: string }[]>([]);
+  const [isMealLoading, setIsMealLoading] = useState(false);
 
-  // 1. 급식 정보 가져오기 (NEIS API)
+  // 1. 당일 중식 전광판용 정보 가져오기
   const fetchMeal = async () => {
     try {
-      const today = new Date().toISOString().split('T')[0].replace(/-/g, ''); // YYYYMMDD 형식
+      if (!OFFICE_CODE || !SCHOOL_CODE) {
+        setMeal("환경 변수(학교 코드)가 설정되지 않았습니다.");
+        return;
+      }
+
+      const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
       const res = await fetch(
         `https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&ATPT_OFCDC_SC_CODE=${OFFICE_CODE}&SD_SCHUL_CODE=${SCHOOL_CODE}&MLSV_YMD=${today}`
       );
@@ -36,7 +47,6 @@ export default function RetroDashboard() {
       
       if (data.mealServiceDietInfo) {
         let menu = data.mealServiceDietInfo[1].row[0].DDISH_NM;
-        // 알러지 정보(숫자) 제거 및 줄바꿈 처리
         menu = menu.replace(/[0-9.]/g, '').replace(/<br\/>/g, ', ');
         setMeal(menu);
       } else {
@@ -44,6 +54,53 @@ export default function RetroDashboard() {
       }
     } catch (err) {
       setMeal("급식 정보를 불러오는데 실패했습니다.");
+    }
+  };
+
+  // 2. 선택한 날짜의 전체 급식 정보 가져오기 (캐싱 적용)
+  const fetchDailyMeals = async (dateStr: string) => {
+    if (!OFFICE_CODE || !SCHOOL_CODE) {
+      setDailyMeals([{ type: "ERROR", menu: "환경 변수가 설정되지 않았습니다." }]);
+      return;
+    }
+
+    const formattedDate = dateStr.replace(/-/g, '');
+
+    // 캐시 확인 로직: 이미 조회한 날짜라면 캐시된 데이터를 사용하고 API 호출 생략
+    if (mealCache.has(formattedDate)) {
+      setDailyMeals(mealCache.get(formattedDate) || []);
+      return;
+    }
+
+    setIsMealLoading(true);
+    setDailyMeals([]);
+    
+    try {
+      const res = await fetch(
+        `https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&ATPT_OFCDC_SC_CODE=${OFFICE_CODE}&SD_SCHUL_CODE=${SCHOOL_CODE}&MLSV_YMD=${formattedDate}`
+      );
+      const data = await res.json();
+      
+      let mealsToCache = [];
+
+      if (data.mealServiceDietInfo) {
+        const rows = data.mealServiceDietInfo[1].row;
+        mealsToCache = rows.map((row: any) => ({
+          type: row.MMEAL_SC_NM,
+          menu: row.DDISH_NM.replace(/[0-9.]/g, '').replace(/<br\/>/g, ', ')
+        }));
+      } else {
+        mealsToCache = [{ type: "INFO", menu: "해당 날짜의 급식 정보가 존재하지 않습니다." }];
+      }
+
+      // API 응답 결과를 캐시에 저장
+      mealCache.set(formattedDate, mealsToCache);
+      setDailyMeals(mealsToCache);
+
+    } catch (err) {
+      setDailyMeals([{ type: "ERROR", menu: "급식 데이터를 불러오는 중 오류가 발생했습니다." }]);
+    } finally {
+      setIsMealLoading(false);
     }
   };
 
@@ -75,7 +132,7 @@ export default function RetroDashboard() {
 
   return (
     <div className="min-h-screen bg-[#f0e7db] text-[#222] font-mono p-4 md:p-8">
-      {/* 상단 전광판: 오늘의 급식 (Marquee 효과) */}
+      {/* 상단 전광판 */}
       <div className="max-w-4xl mx-auto mb-6 bg-black text-[#00ff41] p-2 border-4 border-gray-600 overflow-hidden shadow-inner">
         <div className="flex whitespace-nowrap animate-marquee">
           <span className="text-sm font-bold uppercase tracking-tighter">
@@ -91,16 +148,61 @@ export default function RetroDashboard() {
 
       <main className="max-w-4xl mx-auto">
         {view === 'home' ? (
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div onClick={() => setView('timetable')} className="cursor-pointer bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div onClick={() => setView('timetable')} className="cursor-pointer bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all flex flex-col items-center text-center">
               <div className="text-5xl mb-4">📅</div>
               <h2 className="text-2xl font-black mb-2 underline">시간표 조회</h2>
-              <p className="font-bold text-gray-500 text-sm italic">GET YOUR BACKGROUND IMAGE</p>
+              <p className="font-bold text-gray-500 text-xs italic">GET BACKGROUND</p>
             </div>
-            <div onClick={() => { setView('notice-list'); fetchNotices(); }} className="cursor-pointer bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
+            <div onClick={() => { setView('notice-list'); fetchNotices(); }} className="cursor-pointer bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all flex flex-col items-center text-center">
               <div className="text-5xl mb-4">📢</div>
               <h2 className="text-2xl font-black mb-2 underline">학급 공지사항</h2>
-              <p className="font-bold text-gray-500 text-sm italic">REAL-TIME CLASS UPDATES</p>
+              <p className="font-bold text-gray-500 text-xs italic">CLASS UPDATES</p>
+            </div>
+            <div onClick={() => { setView('meal-board'); fetchDailyMeals(selectedDate); }} className="cursor-pointer bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all flex flex-col items-center text-center">
+              <div className="text-5xl mb-4">🍱</div>
+              <h2 className="text-2xl font-black mb-2 underline">급식 조회</h2>
+              <p className="font-bold text-gray-500 text-xs italic">CHECK ALL MEALS</p>
+            </div>
+          </section>
+        ) : view === 'meal-board' ? (
+          <section className="max-w-2xl mx-auto bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <div className="bg-[#00ff41] text-black px-4 py-1 border-b-4 border-black flex justify-between font-bold text-xs tracking-widest">
+              <span>MEAL_BOARD.EXE</span>
+              <button onClick={resetView}>X</button>
+            </div>
+            <div className="p-6 space-y-6">
+              <div className="flex space-x-2">
+                <input 
+                  type="date" 
+                  value={selectedDate} 
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="w-full border-4 border-black p-2 font-bold uppercase"
+                />
+                <button 
+                  onClick={() => fetchDailyMeals(selectedDate)}
+                  className="bg-black text-white px-6 font-bold border-4 border-black hover:bg-gray-800 transition-colors"
+                >
+                  SEARCH
+                </button>
+              </div>
+              
+              <div className="space-y-4 min-h-[150px]">
+                {isMealLoading ? (
+                  <p className="font-bold text-center py-8 animate-pulse text-gray-500">LOADING_DATA...</p>
+                ) : dailyMeals.length > 0 ? (
+                  dailyMeals.map((m, idx) => (
+                    <div key={idx} className="border-4 border-black p-5 bg-yellow-50 relative mt-4">
+                      <div className="absolute -top-3 left-4 bg-black text-white px-3 py-1 text-xs font-black uppercase tracking-widest border-2 border-black">
+                        {m.type}
+                      </div>
+                      <p className="mt-2 text-sm leading-relaxed font-bold">{m.menu}</p>
+                    </div>
+                  ))
+                ) : null}
+              </div>
+              
+              <button onClick={resetView} className="w-full bg-black text-white py-3 font-bold mt-4 border-4 border-black hover:bg-gray-800">BACK_TO_HOME</button>
             </div>
           </section>
         ) : view === 'notice-list' ? (
@@ -163,7 +265,6 @@ export default function RetroDashboard() {
         <span className="cursor-default select-none" onClick={() => { setClickCount(prev => { if (prev + 1 >= 5) { setView('admin'); return 0; } return prev + 1; }); }}>.</span>
       </footer>
 
-      {/* Marquee 스타일 정의 */}
       <style jsx global>{`
         @keyframes marquee {
           0% { transform: translateX(0); }
