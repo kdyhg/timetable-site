@@ -228,7 +228,7 @@ export default function RetroDashboard() {
               <div className="space-y-4">
                 <h2 className="text-xl font-black">ADMIN_LOGIN</h2>
                 <input type="password" className="w-full border-4 border-black p-2" value={adminPassword} onChange={(e)=>setAdminPassword(e.target.value)} placeholder="PASSWORD" />
-                <button onClick={()=>{if(adminPassword==='1234')setIsAdminAuthenticated(true); else alert('Error');}} className="w-full bg-black text-white py-2 font-bold">ACCESS</button>
+                <button onClick={()=>{if(adminPassword==='5314')setIsAdminAuthenticated(true); else alert('Error');}} className="w-full bg-black text-white py-2 font-bold">ACCESS</button>
               </div>
             ) : (
               <div className="space-y-4 text-left">
