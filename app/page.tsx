@@ -32,6 +32,11 @@ type Notice = {
   created_at: string;
   is_important: boolean;
 };
+type SupabaseError = {
+  message?: string;
+  details?: string;
+  hint?: string;
+};
 type ViewType =
   | "home"
   | "timetable"
@@ -53,6 +58,11 @@ const getLocalDateString = () => {
 
 const cleanMealMenu = (menu: string) =>
   menu.replace(/[0-9.]/g, "").replace(/<br\/?>/g, ", ");
+
+const getSupabaseErrorMessage = (error: SupabaseError | null | undefined) => {
+  if (!error) return "";
+  return [error.message, error.details, error.hint].filter(Boolean).join(" ");
+};
 
 const HomeCard = ({
   label,
@@ -97,6 +107,10 @@ export default function RetroDashboard() {
   const [meal, setMeal] = useState<string>("오늘의 급식을 불러오는 중...");
   const [loading, setLoading] = useState(true);
   const [isImportant, setIsImportant] = useState(false);
+  const [noticeTitle, setNoticeTitle] = useState("");
+  const [noticeContent, setNoticeContent] = useState("");
+  const [noticeError, setNoticeError] = useState("");
+  const [isNoticeSaving, setIsNoticeSaving] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState(getLocalDateString());
   const [dailyMeals, setDailyMeals] = useState<Meal[]>([]);
@@ -188,19 +202,36 @@ export default function RetroDashboard() {
 
   const fetchNotices = async () => {
     if (!supabase) {
+      setNoticeError("Supabase 환경 변수가 설정되어 있지 않습니다.");
       setLoading(false);
       return;
     }
 
     setLoading(true);
-    const { data } = await supabase
-      .from("notices")
-      .select("*")
-      .order("is_important", { ascending: false })
-      .order("created_at", { ascending: false });
+    setNoticeError("");
 
-    if (data) setNotices(data as Notice[]);
-    setLoading(false);
+    try {
+      const { data, error } = await supabase
+        .from("notices")
+        .select("*")
+        .order("is_important", { ascending: false })
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        setNoticeError(`공지사항을 불러오지 못했습니다. ${getSupabaseErrorMessage(error)}`);
+        return;
+      }
+
+      setNotices((data ?? []) as Notice[]);
+    } catch (error) {
+      setNoticeError(
+        `공지사항을 불러오지 못했습니다. ${
+          error instanceof Error ? error.message : "네트워크 연결을 확인하세요."
+        }`,
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -209,25 +240,56 @@ export default function RetroDashboard() {
   }, []);
 
   const saveNotice = async (title: string, content: string) => {
-    if (!supabase) return;
+    if (!supabase) {
+      setNoticeError("Supabase 환경 변수가 설정되어 있지 않습니다.");
+      return;
+    }
 
-    const { error } = await supabase
-      .from("notices")
-      .insert([{ title, content, is_important: isImportant }]);
+    setIsNoticeSaving(true);
+    setNoticeError("");
 
-    if (!error) {
-      fetchNotices();
+    try {
+      const { error } = await supabase
+        .from("notices")
+        .insert([{ title: title.trim(), content: content.trim(), is_important: isImportant }]);
+
+      if (error) {
+        setNoticeError(`공지사항 저장에 실패했습니다. ${getSupabaseErrorMessage(error)}`);
+        return;
+      }
+
+      await fetchNotices();
+      setNoticeTitle("");
+      setNoticeContent("");
       setView("notice-list");
       setIsImportant(false);
+    } catch (error) {
+      setNoticeError(
+        `공지사항 저장에 실패했습니다. ${
+          error instanceof Error ? error.message : "네트워크 연결을 확인하세요."
+        }`,
+      );
+    } finally {
+      setIsNoticeSaving(false);
     }
   };
 
   const deleteNotice = async (id: number) => {
-    if (!supabase) return;
+    if (!supabase) {
+      setNoticeError("Supabase 환경 변수가 설정되어 있지 않습니다.");
+      return;
+    }
 
     if (confirm("삭제할까요?")) {
-      await supabase.from("notices").delete().eq("id", id);
-      fetchNotices();
+      setNoticeError("");
+      const { error } = await supabase.from("notices").delete().eq("id", id);
+
+      if (error) {
+        setNoticeError(`공지사항 삭제에 실패했습니다. ${getSupabaseErrorMessage(error)}`);
+        return;
+      }
+
+      await fetchNotices();
     }
   };
 
@@ -235,6 +297,7 @@ export default function RetroDashboard() {
     setView("home");
     setViewPath("");
     setStudentId("");
+    setNoticeError("");
     setClickCount(0);
   };
 
@@ -526,11 +589,20 @@ export default function RetroDashboard() {
               {isAdminAuthenticated && (
                 <button
                   type="button"
-                  onClick={() => setView("notice-write")}
+                  onClick={() => {
+                    setNoticeError("");
+                    setView("notice-write");
+                  }}
                   className="w-full bg-blue-600 text-white py-3 font-black border-4 border-black mb-4 hover:bg-blue-700"
                 >
                   WRITE_NOTICE
                 </button>
+              )}
+
+              {noticeError && (
+                <div className="border-4 border-red-600 bg-red-50 p-3 text-sm font-bold text-red-700">
+                  {noticeError}
+                </div>
               )}
 
               {loading ? (
@@ -589,15 +661,19 @@ export default function RetroDashboard() {
                 POST_NOTICE
               </h2>
               <input
-                id="n_title"
                 type="text"
+                value={noticeTitle}
+                onChange={(event) => setNoticeTitle(event.target.value)}
                 className="w-full border-2 border-black p-2 font-bold"
                 placeholder="제목"
+                disabled={isNoticeSaving}
               />
               <textarea
-                id="n_content"
+                value={noticeContent}
+                onChange={(event) => setNoticeContent(event.target.value)}
                 className="w-full border-2 border-black p-2 h-32"
                 placeholder="내용"
+                disabled={isNoticeSaving}
               />
               <label className="flex items-center space-x-2 bg-yellow-100 p-2 border-2 border-black border-dashed cursor-pointer">
                 <input
@@ -608,29 +684,33 @@ export default function RetroDashboard() {
                 />
                 <span className="font-bold text-xs">중요 공지</span>
               </label>
+              {noticeError && (
+                <div className="border-4 border-red-600 bg-red-50 p-3 text-sm font-bold text-red-700">
+                  {noticeError}
+                </div>
+              )}
               <div className="flex gap-2 mt-4">
                 <button
                   type="button"
                   onClick={() => {
-                    const title = (
-                      document.getElementById("n_title") as HTMLInputElement
-                    ).value;
-                    const content = (
-                      document.getElementById(
-                        "n_content",
-                      ) as HTMLTextAreaElement
-                    ).value;
-
-                    if (title && content) saveNotice(title, content);
-                    else alert("제목과 내용을 입력하세요.");
+                    if (noticeTitle.trim() && noticeContent.trim()) {
+                      saveNotice(noticeTitle, noticeContent);
+                    } else {
+                      setNoticeError("제목과 내용을 입력하세요.");
+                    }
                   }}
-                  className="flex-1 bg-blue-600 text-white py-3 font-black border-4 border-black"
+                  disabled={isNoticeSaving}
+                  className="flex-1 bg-blue-600 text-white py-3 font-black border-4 border-black disabled:cursor-not-allowed disabled:bg-gray-400"
                 >
-                  DB_COMMIT
+                  {isNoticeSaving ? "SAVING..." : "DB_COMMIT"}
                 </button>
                 <button
                   type="button"
-                  onClick={() => setView("notice-list")}
+                  onClick={() => {
+                    setNoticeError("");
+                    setView("notice-list");
+                  }}
+                  disabled={isNoticeSaving}
                   className="flex-1 bg-gray-300 text-black py-3 font-black border-4 border-black"
                 >
                   CANCEL
@@ -655,6 +735,7 @@ export default function RetroDashboard() {
                   onClick={() => {
                     if (adminPassword === "5314") {
                       setIsAdminAuthenticated(true);
+                      setNoticeError("");
                       setView(prevView);
                       setAdminPassword("");
                     } else {
@@ -689,6 +770,7 @@ export default function RetroDashboard() {
                   type="button"
                   onClick={() => {
                     setIsAdminAuthenticated(false);
+                    setNoticeError("");
                     setView("home");
                   }}
                   className="w-full bg-red-500 text-white py-3 font-bold border-4 border-black mt-2"
