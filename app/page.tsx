@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import {
   admissionDocuments,
@@ -10,15 +9,9 @@ import {
   type AdmissionRegionFilter,
 } from "./admissions-data";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-const supabase =
-  supabaseUrl && supabaseAnonKey
-    ? createClient(supabaseUrl, supabaseAnonKey)
-    : null;
-
 const OFFICE_CODE = process.env.NEXT_PUBLIC_OFFICE_CODE || "C10";
 const SCHOOL_CODE = process.env.NEXT_PUBLIC_SCHOOL_CODE || "7150404";
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "5314";
 
 type Meal = { type: string; menu: string };
 type MealApiRow = { MMEAL_SC_NM: string; DDISH_NM: string };
@@ -32,10 +25,9 @@ type Notice = {
   created_at: string;
   is_important: boolean;
 };
-type SupabaseError = {
-  message?: string;
-  details?: string;
-  hint?: string;
+type NoticesApiResponse = {
+  notices?: Notice[];
+  error?: string;
 };
 type ViewType =
   | "home"
@@ -59,9 +51,14 @@ const getLocalDateString = () => {
 const cleanMealMenu = (menu: string) =>
   menu.replace(/[0-9.]/g, "").replace(/<br\/?>/g, ", ");
 
-const getSupabaseErrorMessage = (error: SupabaseError | null | undefined) => {
-  if (!error) return "";
-  return [error.message, error.details, error.hint].filter(Boolean).join(" ");
+const parseNoticeResponse = async (response: Response) => {
+  const body = (await response.json().catch(() => ({}))) as NoticesApiResponse;
+
+  if (!response.ok) {
+    throw new Error(body.error || `HTTP ${response.status}`);
+  }
+
+  return body;
 };
 
 const HomeCard = ({
@@ -100,6 +97,7 @@ export default function RetroDashboard() {
   const [studentId, setStudentId] = useState("");
   const [viewPath, setViewPath] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
+  const [adminSessionPassword, setAdminSessionPassword] = useState("");
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [, setClickCount] = useState(0);
 
@@ -139,7 +137,7 @@ export default function RetroDashboard() {
     filteredAdmissions.find((document) => document.id === selectedAdmission.id) ||
     filteredAdmissions[0];
 
-  const fetchMeal = async () => {
+  const fetchMeal = useCallback(async () => {
     try {
       const today = getLocalDateString().replace(/-/g, "");
       const res = await fetch(
@@ -155,7 +153,7 @@ export default function RetroDashboard() {
     } catch {
       setMeal("급식 정보를 불러오지 못했습니다.");
     }
-  };
+  }, []);
 
   const fetchDailyMeals = async (dateStr: string) => {
     const formattedDate = dateStr.replace(/-/g, "");
@@ -200,29 +198,15 @@ export default function RetroDashboard() {
     }
   };
 
-  const fetchNotices = async () => {
-    if (!supabase) {
-      setNoticeError("Supabase 환경 변수가 설정되어 있지 않습니다.");
-      setLoading(false);
-      return;
-    }
-
+  const fetchNotices = useCallback(async () => {
     setLoading(true);
     setNoticeError("");
 
     try {
-      const { data, error } = await supabase
-        .from("notices")
-        .select("*")
-        .order("is_important", { ascending: false })
-        .order("created_at", { ascending: false });
+      const response = await fetch("/api/notices", { cache: "no-store" });
+      const body = await parseNoticeResponse(response);
 
-      if (error) {
-        setNoticeError(`공지사항을 불러오지 못했습니다. ${getSupabaseErrorMessage(error)}`);
-        return;
-      }
-
-      setNotices((data ?? []) as Notice[]);
+      setNotices(body.notices ?? []);
     } catch (error) {
       setNoticeError(
         `공지사항을 불러오지 못했습니다. ${
@@ -232,31 +216,32 @@ export default function RetroDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchMeal();
     fetchNotices();
-  }, []);
+  }, [fetchMeal, fetchNotices]);
 
   const saveNotice = async (title: string, content: string) => {
-    if (!supabase) {
-      setNoticeError("Supabase 환경 변수가 설정되어 있지 않습니다.");
-      return;
-    }
-
     setIsNoticeSaving(true);
     setNoticeError("");
 
     try {
-      const { error } = await supabase
-        .from("notices")
-        .insert([{ title: title.trim(), content: content.trim(), is_important: isImportant }]);
+      const response = await fetch("/api/notices", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-password": adminSessionPassword,
+        },
+        body: JSON.stringify({
+          title: title.trim(),
+          content: content.trim(),
+          is_important: isImportant,
+        }),
+      });
 
-      if (error) {
-        setNoticeError(`공지사항 저장에 실패했습니다. ${getSupabaseErrorMessage(error)}`);
-        return;
-      }
+      await parseNoticeResponse(response);
 
       await fetchNotices();
       setNoticeTitle("");
@@ -275,19 +260,16 @@ export default function RetroDashboard() {
   };
 
   const deleteNotice = async (id: number) => {
-    if (!supabase) {
-      setNoticeError("Supabase 환경 변수가 설정되어 있지 않습니다.");
-      return;
-    }
-
     if (confirm("삭제할까요?")) {
       setNoticeError("");
-      const { error } = await supabase.from("notices").delete().eq("id", id);
+      const response = await fetch(`/api/notices?id=${id}`, {
+        method: "DELETE",
+        headers: {
+          "x-admin-password": adminSessionPassword,
+        },
+      });
 
-      if (error) {
-        setNoticeError(`공지사항 삭제에 실패했습니다. ${getSupabaseErrorMessage(error)}`);
-        return;
-      }
+      await parseNoticeResponse(response);
 
       await fetchNotices();
     }
@@ -733,8 +715,9 @@ export default function RetroDashboard() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (adminPassword === "5314") {
+                    if (adminPassword === ADMIN_PASSWORD) {
                       setIsAdminAuthenticated(true);
+                      setAdminSessionPassword(adminPassword);
                       setNoticeError("");
                       setView(prevView);
                       setAdminPassword("");
@@ -770,6 +753,7 @@ export default function RetroDashboard() {
                   type="button"
                   onClick={() => {
                     setIsAdminAuthenticated(false);
+                    setAdminSessionPassword("");
                     setNoticeError("");
                     setView("home");
                   }}
