@@ -272,7 +272,7 @@ export default function RetroDashboard() {
           className="text-xl md:text-2xl font-black uppercase cursor-pointer"
           onClick={resetView}
         >
-          2026 동래고 2학년 10반
+          2026 해강고 2학년 10반
         </h1>
         <div className="bg-yellow-300 border-2 border-black px-3 py-1 font-bold text-xs flex w-fit items-center gap-2">
           SYSTEM_ONLINE
