@@ -146,6 +146,36 @@ export default function RetroDashboard() {
     medicalAdmissionsWorkbook.sheets.find(
       (sheet) => sheet.name === selectedMedicalSheetName,
     ) ?? medicalAdmissionsWorkbook.sheets[0];
+  const medicalColumnMetas = useMemo(() => {
+    if (!activeMedicalSheet) {
+      return [];
+    }
+
+    const headerRows = activeMedicalSheet.rows.slice(
+      0,
+      activeMedicalSheet.headerRowCount,
+    );
+    const columnCount = Math.max(
+      0,
+      ...activeMedicalSheet.rows.map((row) => row.length),
+    );
+
+    return Array.from({ length: columnCount }, (_, columnIndex) => {
+      const headerText = headerRows
+        .map((row) => row[columnIndex]?.trim())
+        .filter(Boolean)
+        .join(" ");
+
+      return {
+        index: columnIndex,
+        headerText,
+        isDetailColumn: /특징|조건|평가요소|수능최저|전형방법/.test(
+          headerText,
+        ),
+        isUniversityColumn: /대학/.test(headerText),
+      };
+    }).filter((meta) => meta.headerText !== "순번");
+  }, [activeMedicalSheet]);
 
   const fetchMeal = useCallback(async () => {
     try {
@@ -643,38 +673,75 @@ export default function RetroDashboard() {
                     </span>
                     <span className="text-xs font-bold">
                       ROWS {activeMedicalSheet.rowCount} / COLS{" "}
-                      {activeMedicalSheet.columnCount}
+                      {medicalColumnMetas.length}
                     </span>
                   </div>
-                  <div className="max-h-[70vh] overflow-auto bg-white">
-                    <table className="min-w-full border-collapse text-xs md:text-sm">
-                      <tbody>
-                        {activeMedicalSheet.rows.map((row, rowIndex) => {
-                          const isHeader =
-                            rowIndex < activeMedicalSheet.headerRowCount;
-                          const Cell = isHeader ? "th" : "td";
-
-                          return (
+                  <div className="max-h-[72vh] overflow-auto bg-white">
+                    <table className="min-w-full border-separate border-spacing-0 text-[13px] leading-relaxed md:text-sm">
+                      <thead className="sticky top-0 z-10">
+                        {activeMedicalSheet.rows
+                          .slice(0, activeMedicalSheet.headerRowCount)
+                          .map((row, rowIndex) => (
                             <tr
-                              key={`${activeMedicalSheet.name}-${rowIndex}`}
-                              className={rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                              key={`${activeMedicalSheet.name}-header-${rowIndex}`}
                             >
-                              {row.map((cell, columnIndex) => (
-                                <Cell
-                                  key={`${activeMedicalSheet.name}-${rowIndex}-${columnIndex}`}
-                                  className={`min-w-24 border-2 border-black px-2 py-2 align-top ${
-                                    isHeader
-                                      ? "bg-yellow-100 text-center font-black"
-                                      : "font-bold"
+                              {medicalColumnMetas.map((meta) => (
+                                <th
+                                  key={`${activeMedicalSheet.name}-header-${rowIndex}-${meta.index}`}
+                                  className={`border-b-2 border-r-2 border-black bg-yellow-100 px-3 py-3 text-center font-black align-middle ${
+                                    meta.isDetailColumn
+                                      ? "min-w-72 max-w-[460px]"
+                                      : "min-w-28"
                                   }`}
-                                  style={{ whiteSpace: "pre-line" }}
+                                  style={{
+                                    overflowWrap: "anywhere",
+                                    whiteSpace: "pre-line",
+                                    wordBreak: "keep-all",
+                                  }}
                                 >
-                                  {cell || "\u00A0"}
-                                </Cell>
+                                  {row[meta.index] || "\u00A0"}
+                                </th>
                               ))}
                             </tr>
-                          );
-                        })}
+                          ))}
+                      </thead>
+                      <tbody>
+                        {activeMedicalSheet.rows
+                          .slice(activeMedicalSheet.headerRowCount)
+                          .map((row, rowIndex) => (
+                            <tr
+                              key={`${activeMedicalSheet.name}-${rowIndex}`}
+                              className={`${
+                                rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"
+                              } hover:bg-blue-50`}
+                            >
+                              {medicalColumnMetas.map((meta) => {
+                                const cell = row[meta.index] || "";
+
+                                return (
+                                  <td
+                                    key={`${activeMedicalSheet.name}-${rowIndex}-${meta.index}`}
+                                    className={`border-b-2 border-r-2 border-black px-3 py-3 align-top ${
+                                      meta.isDetailColumn
+                                        ? "min-w-72 max-w-[460px] text-left text-[12px] md:text-[13px]"
+                                        : "min-w-28"
+                                    } ${
+                                      meta.isUniversityColumn
+                                        ? "bg-yellow-50 font-black"
+                                        : "font-semibold"
+                                    }`}
+                                    style={{
+                                      overflowWrap: "anywhere",
+                                      whiteSpace: "pre-line",
+                                      wordBreak: "keep-all",
+                                    }}
+                                  >
+                                    {cell || "\u00A0"}
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>
@@ -684,7 +751,6 @@ export default function RetroDashboard() {
                   표시할 시트가 없습니다
                 </section>
               )}
-
               <button
                 type="button"
                 onClick={() => setView("career")}
