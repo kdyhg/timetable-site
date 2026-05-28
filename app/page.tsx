@@ -30,6 +30,36 @@ type NoticesApiResponse = {
   notices?: Notice[];
   error?: string;
 };
+type MedicalDisplayMode = "summary" | "table";
+type MedicalAdmissionType = "all" | "교과" | "학종" | "정시";
+type MedicalCsatFilter = "all" | "with" | "none";
+type MedicalRecord = {
+  key: string;
+  sheetName: string;
+  region: string;
+  university: string;
+  curriculumCount: string;
+  curriculumMethod: string;
+  curriculumCsatArea: string;
+  curriculumCsatCondition: string;
+  schoolRecordCount: string;
+  schoolRecordMethod: string;
+  schoolRecordCsatArea: string;
+  schoolRecordCsatCondition: string;
+  regularGa: string;
+  regularNa: string;
+  regularDa: string;
+  regularMethod: string;
+  regularIndicator: string;
+  regularKorean: string;
+  regularEnglish: string;
+  regularMath: string;
+  regularSocial: string;
+  regularScience: string;
+  regularCountText: string;
+  csatSummary: string;
+  searchText: string;
+};
 type ViewType =
   | "home"
   | "timetable"
@@ -42,6 +72,37 @@ type ViewType =
   | "admissions";
 
 const mealCache = new Map<string, Meal[]>();
+const medicalCareerSheetNames = ["의예", "치의예", "약학", "한의예", "수의예"];
+const defaultMedicalSheetName = medicalCareerSheetNames[0];
+const medicalAdmissionTypeFilters: {
+  id: MedicalAdmissionType;
+  label: string;
+}[] = [
+  { id: "all", label: "전체" },
+  { id: "교과", label: "교과" },
+  { id: "학종", label: "학종" },
+  { id: "정시", label: "정시" },
+];
+const medicalCsatFilters: { id: MedicalCsatFilter; label: string }[] = [
+  { id: "all", label: "최저 전체" },
+  { id: "with", label: "최저 있음" },
+  { id: "none", label: "최저 없음" },
+];
+
+const hasMedicalValue = (value: string) => {
+  const trimmed = value.trim();
+
+  return Boolean(trimmed) && !/^(미선발|-|없음)$/.test(trimmed);
+};
+
+const displayMedicalValue = (value: string) =>
+  hasMedicalValue(value) ? value.trim() : "-";
+
+const compactMedicalValue = (value: string) =>
+  displayMedicalValue(value).replace(/\n/g, " / ");
+
+const joinMedicalParts = (parts: string[]) =>
+  parts.filter(hasMedicalValue).map(compactMedicalValue).join(" / ");
 
 const getLocalDateString = () => {
   const d = new Date();
@@ -123,8 +184,19 @@ export default function RetroDashboard() {
   const [selectedAdmission, setSelectedAdmission] =
     useState<AdmissionDocument>(admissionDocuments[0]);
   const [selectedMedicalSheetName, setSelectedMedicalSheetName] = useState(
-    medicalAdmissionsWorkbook.sheets[0]?.name ?? "",
+    defaultMedicalSheetName,
   );
+  const [medicalDisplayMode, setMedicalDisplayMode] =
+    useState<MedicalDisplayMode>("summary");
+  const [medicalQuery, setMedicalQuery] = useState("");
+  const [medicalRegion, setMedicalRegion] = useState("all");
+  const [medicalAdmissionType, setMedicalAdmissionType] =
+    useState<MedicalAdmissionType>("all");
+  const [medicalCsatFilter, setMedicalCsatFilter] =
+    useState<MedicalCsatFilter>("all");
+  const [expandedMedicalRecordKey, setExpandedMedicalRecordKey] = useState<
+    string | null
+  >(null);
 
   const filteredAdmissions = useMemo(() => {
     const query = admissionQuery.trim().toLowerCase();
@@ -176,6 +248,113 @@ export default function RetroDashboard() {
       };
     }).filter((meta) => meta.headerText !== "순번");
   }, [activeMedicalSheet]);
+  const visibleMedicalSheets =
+    medicalDisplayMode === "summary"
+      ? medicalAdmissionsWorkbook.sheets.filter((sheet) =>
+          medicalCareerSheetNames.includes(sheet.name),
+        )
+      : medicalAdmissionsWorkbook.sheets;
+  const medicalRecords = useMemo<MedicalRecord[]>(() => {
+    if (
+      !activeMedicalSheet ||
+      !medicalCareerSheetNames.includes(activeMedicalSheet.name)
+    ) {
+      return [];
+    }
+
+    return activeMedicalSheet.rows
+      .slice(activeMedicalSheet.headerRowCount)
+      .map((row, rowIndex) => {
+        const regularCountText =
+          [
+            ["가", row[10] ?? ""],
+            ["나", row[11] ?? ""],
+            ["다", row[12] ?? ""],
+          ]
+            .filter(([, value]) => hasMedicalValue(value))
+            .map(([group, value]) => `${group} ${compactMedicalValue(value)}`)
+            .join(" / ") || "-";
+        const csatSummary =
+          joinMedicalParts([
+            row[4] ?? "",
+            row[5] ?? "",
+            row[8] ?? "",
+            row[9] ?? "",
+          ]) || "최저 정보 없음";
+
+        return {
+          key: `${activeMedicalSheet.name}-${rowIndex}-${row[1] ?? ""}`,
+          sheetName: activeMedicalSheet.name,
+          region: row[0] ?? "",
+          university: row[1] ?? "",
+          curriculumCount: row[2] ?? "",
+          curriculumMethod: row[3] ?? "",
+          curriculumCsatArea: row[4] ?? "",
+          curriculumCsatCondition: row[5] ?? "",
+          schoolRecordCount: row[6] ?? "",
+          schoolRecordMethod: row[7] ?? "",
+          schoolRecordCsatArea: row[8] ?? "",
+          schoolRecordCsatCondition: row[9] ?? "",
+          regularGa: row[10] ?? "",
+          regularNa: row[11] ?? "",
+          regularDa: row[12] ?? "",
+          regularMethod: row[13] ?? "",
+          regularIndicator: row[14] ?? "",
+          regularKorean: row[15] ?? "",
+          regularEnglish: row[16] ?? "",
+          regularMath: row[17] ?? "",
+          regularSocial: row[18] ?? "",
+          regularScience: row[19] ?? "",
+          regularCountText,
+          csatSummary,
+          searchText: row.join(" "),
+        };
+      })
+      .filter((record) => hasMedicalValue(record.university));
+  }, [activeMedicalSheet]);
+  const medicalRegionFilters = useMemo(
+    () =>
+      Array.from(new Set(medicalRecords.map((record) => record.region)))
+        .filter(hasMedicalValue)
+        .sort((a, b) => a.localeCompare(b, "ko")),
+    [medicalRecords],
+  );
+  const filteredMedicalRecords = useMemo(() => {
+    const query = medicalQuery.trim().toLowerCase();
+
+    return medicalRecords.filter((record) => {
+      const queryMatches =
+        !query || record.searchText.toLowerCase().includes(query);
+      const regionMatches =
+        medicalRegion === "all" || record.region === medicalRegion;
+      const typeMatches =
+        medicalAdmissionType === "all" ||
+        (medicalAdmissionType === "교과" &&
+          hasMedicalValue(record.curriculumCount)) ||
+        (medicalAdmissionType === "학종" &&
+          hasMedicalValue(record.schoolRecordCount)) ||
+        (medicalAdmissionType === "정시" &&
+          hasMedicalValue(record.regularCountText));
+      const hasCsatMinimum = [
+        record.curriculumCsatArea,
+        record.curriculumCsatCondition,
+        record.schoolRecordCsatArea,
+        record.schoolRecordCsatCondition,
+      ].some(hasMedicalValue);
+      const csatMatches =
+        medicalCsatFilter === "all" ||
+        (medicalCsatFilter === "with" && hasCsatMinimum) ||
+        (medicalCsatFilter === "none" && !hasCsatMinimum);
+
+      return queryMatches && regionMatches && typeMatches && csatMatches;
+    });
+  }, [
+    medicalAdmissionType,
+    medicalCsatFilter,
+    medicalQuery,
+    medicalRecords,
+    medicalRegion,
+  ]);
 
   const fetchMeal = useCallback(async () => {
     try {
@@ -331,7 +510,13 @@ export default function RetroDashboard() {
   };
 
   const openMedicalAdmissions = () => {
-    setSelectedMedicalSheetName(medicalAdmissionsWorkbook.sheets[0]?.name ?? "");
+    setSelectedMedicalSheetName(defaultMedicalSheetName);
+    setMedicalDisplayMode("summary");
+    setMedicalQuery("");
+    setMedicalRegion("all");
+    setMedicalAdmissionType("all");
+    setMedicalCsatFilter("all");
+    setExpandedMedicalRecordKey(null);
     setView("medical-admissions");
   };
 
@@ -648,12 +833,50 @@ export default function RetroDashboard() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-2 border-4 border-black">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMedicalDisplayMode("summary");
+                    if (!medicalCareerSheetNames.includes(selectedMedicalSheetName)) {
+                      setSelectedMedicalSheetName(defaultMedicalSheetName);
+                    }
+                    setExpandedMedicalRecordKey(null);
+                  }}
+                  className={`py-3 text-sm font-black ${
+                    medicalDisplayMode === "summary"
+                      ? "bg-black text-white"
+                      : "bg-white text-black hover:bg-gray-100"
+                  }`}
+                >
+                  요약 카드
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMedicalDisplayMode("table");
+                    setExpandedMedicalRecordKey(null);
+                  }}
+                  className={`border-l-4 border-black py-3 text-sm font-black ${
+                    medicalDisplayMode === "table"
+                      ? "bg-black text-white"
+                      : "bg-white text-black hover:bg-gray-100"
+                  }`}
+                >
+                  원본 표
+                </button>
+              </div>
+
               <div className="flex gap-2 overflow-x-auto pb-2">
-                {medicalAdmissionsWorkbook.sheets.map((sheet) => (
+                {visibleMedicalSheets.map((sheet) => (
                   <button
                     type="button"
                     key={sheet.name}
-                    onClick={() => setSelectedMedicalSheetName(sheet.name)}
+                    onClick={() => {
+                      setSelectedMedicalSheetName(sheet.name);
+                      setMedicalRegion("all");
+                      setExpandedMedicalRecordKey(null);
+                    }}
                     className={`min-w-20 border-4 border-black px-4 py-2 text-sm font-black ${
                       activeMedicalSheet?.name === sheet.name
                         ? "bg-black text-white"
@@ -665,7 +888,212 @@ export default function RetroDashboard() {
                 ))}
               </div>
 
-              {activeMedicalSheet ? (
+              {medicalDisplayMode === "summary" ? (
+                <section className="space-y-4">
+                  <div className="grid grid-cols-1 gap-3 border-4 border-black bg-[#f8f8f8] p-3 lg:grid-cols-[1.2fr_1fr_1fr_1fr]">
+                    <input
+                      type="search"
+                      value={medicalQuery}
+                      onChange={(event) => {
+                        setMedicalQuery(event.target.value);
+                        setExpandedMedicalRecordKey(null);
+                      }}
+                      className="border-4 border-black bg-white p-3 text-sm font-bold"
+                      placeholder="대학명 검색"
+                    />
+
+                    <select
+                      value={medicalRegion}
+                      onChange={(event) => {
+                        setMedicalRegion(event.target.value);
+                        setExpandedMedicalRecordKey(null);
+                      }}
+                      className="border-4 border-black bg-white p-3 text-sm font-bold"
+                    >
+                      <option value="all">지역 전체</option>
+                      {medicalRegionFilters.map((region) => (
+                        <option key={region} value={region}>
+                          {region}
+                        </option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={medicalAdmissionType}
+                      onChange={(event) => {
+                        setMedicalAdmissionType(
+                          event.target.value as MedicalAdmissionType,
+                        );
+                        setExpandedMedicalRecordKey(null);
+                      }}
+                      className="border-4 border-black bg-white p-3 text-sm font-bold"
+                    >
+                      {medicalAdmissionTypeFilters.map((filter) => (
+                        <option key={filter.id} value={filter.id}>
+                          {filter.label}
+                        </option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={medicalCsatFilter}
+                      onChange={(event) => {
+                        setMedicalCsatFilter(
+                          event.target.value as MedicalCsatFilter,
+                        );
+                        setExpandedMedicalRecordKey(null);
+                      }}
+                      className="border-4 border-black bg-white p-3 text-sm font-bold"
+                    >
+                      {medicalCsatFilters.map((filter) => (
+                        <option key={filter.id} value={filter.id}>
+                          {filter.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="border-4 border-black bg-black px-3 py-2 text-xs font-bold text-white">
+                    {activeMedicalSheet?.name ?? ""} / LIST{" "}
+                    {filteredMedicalRecords.length} OF {medicalRecords.length}
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    {filteredMedicalRecords.length > 0 ? (
+                      filteredMedicalRecords.map((record) => {
+                        const isExpanded =
+                          expandedMedicalRecordKey === record.key;
+
+                        return (
+                          <article
+                            key={record.key}
+                            className="border-4 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
+                          >
+                            <div className="border-b-4 border-black p-4">
+                              <div className="flex items-start justify-between gap-3">
+                                <div>
+                                  <span className="inline-block border-2 border-black bg-[#00ff41] px-2 py-1 text-[11px] font-black">
+                                    {record.region}
+                                  </span>
+                                  <h3 className="mt-2 text-xl font-black">
+                                    {record.university}
+                                  </h3>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setExpandedMedicalRecordKey(
+                                      isExpanded ? null : record.key,
+                                    )
+                                  }
+                                  className="shrink-0 border-4 border-black bg-yellow-300 px-3 py-2 text-xs font-black hover:bg-yellow-200"
+                                >
+                                  {isExpanded ? "접기" : "자세히"}
+                                </button>
+                              </div>
+
+                              <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                                <div className="border-2 border-black bg-yellow-50 p-2">
+                                  <span className="block text-[10px] font-black text-gray-500">
+                                    교과
+                                  </span>
+                                  <span className="block text-sm font-black">
+                                    {compactMedicalValue(record.curriculumCount)}
+                                  </span>
+                                </div>
+                                <div className="border-2 border-black bg-yellow-50 p-2">
+                                  <span className="block text-[10px] font-black text-gray-500">
+                                    학종
+                                  </span>
+                                  <span className="block text-sm font-black">
+                                    {compactMedicalValue(record.schoolRecordCount)}
+                                  </span>
+                                </div>
+                                <div className="border-2 border-black bg-yellow-50 p-2">
+                                  <span className="block text-[10px] font-black text-gray-500">
+                                    정시
+                                  </span>
+                                  <span className="block text-sm font-black">
+                                    {record.regularCountText}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <p
+                                className="mt-3 text-xs font-bold text-gray-600"
+                                style={{
+                                  display: "-webkit-box",
+                                  WebkitBoxOrient: "vertical",
+                                  WebkitLineClamp: 2,
+                                  overflow: "hidden",
+                                }}
+                              >
+                                최저: {record.csatSummary}
+                              </p>
+                            </div>
+
+                            {isExpanded && (
+                              <div className="divide-y-4 divide-black text-sm font-semibold">
+                                <div className="grid gap-3 p-4 md:grid-cols-3">
+                                  <div>
+                                    <h4 className="mb-2 border-b-2 border-black pb-1 text-sm font-black">
+                                      교과
+                                    </h4>
+                                    <p>모집 {compactMedicalValue(record.curriculumCount)}</p>
+                                    <p className="whitespace-pre-line">
+                                      {displayMedicalValue(record.curriculumMethod)}
+                                    </p>
+                                    <p className="mt-2 whitespace-pre-line text-xs text-gray-600">
+                                      최저 {record.curriculumCsatArea || "-"} /{" "}
+                                      {record.curriculumCsatCondition || "-"}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <h4 className="mb-2 border-b-2 border-black pb-1 text-sm font-black">
+                                      학종
+                                    </h4>
+                                    <p>모집 {compactMedicalValue(record.schoolRecordCount)}</p>
+                                    <p className="whitespace-pre-line">
+                                      {displayMedicalValue(record.schoolRecordMethod)}
+                                    </p>
+                                    <p className="mt-2 whitespace-pre-line text-xs text-gray-600">
+                                      최저 {record.schoolRecordCsatArea || "-"} /{" "}
+                                      {record.schoolRecordCsatCondition || "-"}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <h4 className="mb-2 border-b-2 border-black pb-1 text-sm font-black">
+                                      정시
+                                    </h4>
+                                    <p>모집 {record.regularCountText}</p>
+                                    <p className="whitespace-pre-line">
+                                      {displayMedicalValue(record.regularMethod)}
+                                    </p>
+                                    <p className="mt-2 text-xs text-gray-600">
+                                      지표 {displayMedicalValue(record.regularIndicator)}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 bg-[#f8f8f8] p-4 text-xs md:grid-cols-5">
+                                  <span>국어 {compactMedicalValue(record.regularKorean)}</span>
+                                  <span>영어 {compactMedicalValue(record.regularEnglish)}</span>
+                                  <span>수학 {compactMedicalValue(record.regularMath)}</span>
+                                  <span>사탐 {compactMedicalValue(record.regularSocial)}</span>
+                                  <span>과탐 {compactMedicalValue(record.regularScience)}</span>
+                                </div>
+                              </div>
+                            )}
+                          </article>
+                        );
+                      })
+                    ) : (
+                      <section className="border-4 border-black bg-white p-8 text-center font-black lg:col-span-2">
+                        검색 결과가 없습니다
+                      </section>
+                    )}
+                  </div>
+                </section>
+              ) : activeMedicalSheet ? (
                 <section className="border-4 border-black bg-[#f8f8f8]">
                   <div className="flex flex-col gap-1 border-b-4 border-black bg-black px-3 py-2 text-white sm:flex-row sm:items-center sm:justify-between">
                     <span className="text-sm font-black">
