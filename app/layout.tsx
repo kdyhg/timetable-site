@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "해강고 2학년 10반",
-  description: "시간표, 급식, 공지사항, 2028 대입전형 시행계획 자료실",
+  description: "시간표, 급식, 공지사항, 2028 진로진학 자료실",
 };
 
 export default function RootLayout({

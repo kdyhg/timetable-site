@@ -8,6 +8,7 @@ import {
   type AdmissionDocument,
   type AdmissionRegionFilter,
 } from "./admissions-data";
+import { medicalAdmissionsWorkbook } from "./career-data";
 
 const OFFICE_CODE = process.env.NEXT_PUBLIC_OFFICE_CODE || "C10";
 const SCHOOL_CODE = process.env.NEXT_PUBLIC_SCHOOL_CODE || "7150404";
@@ -34,7 +35,9 @@ type ViewType =
   | "timetable"
   | "notice-list"
   | "admin"
+  | "career"
   | "meal-board"
+  | "medical-admissions"
   | "notice-write"
   | "admissions";
 
@@ -119,6 +122,9 @@ export default function RetroDashboard() {
   const [admissionQuery, setAdmissionQuery] = useState("");
   const [selectedAdmission, setSelectedAdmission] =
     useState<AdmissionDocument>(admissionDocuments[0]);
+  const [selectedMedicalSheetName, setSelectedMedicalSheetName] = useState(
+    medicalAdmissionsWorkbook.sheets[0]?.name ?? "",
+  );
 
   const filteredAdmissions = useMemo(() => {
     const query = admissionQuery.trim().toLowerCase();
@@ -136,6 +142,10 @@ export default function RetroDashboard() {
   const activeAdmission =
     filteredAdmissions.find((document) => document.id === selectedAdmission.id) ||
     filteredAdmissions[0];
+  const activeMedicalSheet =
+    medicalAdmissionsWorkbook.sheets.find(
+      (sheet) => sheet.name === selectedMedicalSheetName,
+    ) ?? medicalAdmissionsWorkbook.sheets[0];
 
   const fetchMeal = useCallback(async () => {
     try {
@@ -290,6 +300,11 @@ export default function RetroDashboard() {
     setView("admissions");
   };
 
+  const openMedicalAdmissions = () => {
+    setSelectedMedicalSheetName(medicalAdmissionsWorkbook.sheets[0]?.name ?? "");
+    setView("medical-admissions");
+  };
+
   const handleAdminTrigger = () => {
     setClickCount((prev) => {
       if (prev + 1 >= 5) {
@@ -360,18 +375,80 @@ export default function RetroDashboard() {
               }}
             />
             <HomeCard
-              label="PDF"
-              title="2028 대입전형"
-              subtitle="ADMISSION PLANS"
+              label="2028"
+              title="2028 진로진학"
+              subtitle="CAREER GUIDE"
               color="bg-red-500 text-white"
-              onClick={openAdmissions}
+              onClick={() => setView("career")}
             />
+          </section>
+        ) : view === "career" ? (
+          <section className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <div className="bg-red-500 text-white px-4 py-2 border-b-4 border-black flex justify-between font-bold text-xs">
+              <span>CAREER_2028.EXE</span>
+              <button type="button" onClick={resetView}>
+                X
+              </button>
+            </div>
+
+            <div className="p-4 md:p-6 space-y-6">
+              <div className="flex flex-col gap-2">
+                <p className="text-xs font-black text-gray-500">
+                  2028학년도 진로진학 자료실
+                </p>
+                <h2 className="text-2xl md:text-3xl font-black">
+                  2028 진로진학
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <button
+                  type="button"
+                  onClick={openAdmissions}
+                  className="border-4 border-black bg-yellow-50 p-5 text-left shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
+                >
+                  <span className="mb-4 flex h-12 w-12 items-center justify-center border-4 border-black bg-red-500 text-sm font-black text-white">
+                    PDF
+                  </span>
+                  <span className="block text-xl font-black underline">
+                    2028 대입전형
+                  </span>
+                  <span className="mt-2 block text-sm font-bold text-gray-500">
+                    대학별 대입전형 시행계획
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={openMedicalAdmissions}
+                  className="border-4 border-black bg-[#f8f8f8] p-5 text-left shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
+                >
+                  <span className="mb-4 flex h-12 w-12 items-center justify-center border-4 border-black bg-[#00ff41] text-sm font-black text-black">
+                    XLSX
+                  </span>
+                  <span className="block text-xl font-black underline">
+                    의약학계열 전형 정리
+                  </span>
+                  <span className="mt-2 block text-sm font-bold text-gray-500">
+                    교과, 학종, 정시, 의약학계열 표
+                  </span>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={resetView}
+                className="w-full bg-black text-white py-3 font-bold border-4 border-black hover:bg-gray-800"
+              >
+                BACK_TO_HOME
+              </button>
+            </div>
           </section>
         ) : view === "admissions" ? (
           <section className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
             <div className="bg-red-500 text-white px-4 py-2 border-b-4 border-black flex justify-between font-bold text-xs">
               <span>ADMISSIONS_2028.PDF</span>
-              <button type="button" onClick={resetView}>
+              <button type="button" onClick={() => setView("career")}>
                 X
               </button>
             </div>
@@ -496,10 +573,124 @@ export default function RetroDashboard() {
 
               <button
                 type="button"
-                onClick={resetView}
+                onClick={() => setView("career")}
                 className="w-full bg-black text-white py-3 font-bold border-4 border-black hover:bg-gray-800"
               >
-                BACK_TO_HOME
+                BACK_TO_CAREER
+              </button>
+            </div>
+          </section>
+        ) : view === "medical-admissions" ? (
+          <section className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <div className="bg-red-500 text-white px-4 py-2 border-b-4 border-black flex justify-between font-bold text-xs">
+              <span>MEDICAL_2028.XLSX</span>
+              <button type="button" onClick={() => setView("career")}>
+                X
+              </button>
+            </div>
+
+            <div className="p-4 md:p-6 space-y-5">
+              <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <p className="text-xs font-black text-gray-500">
+                    2028 진로진학
+                  </p>
+                  <h2 className="text-2xl md:text-3xl font-black">
+                    {medicalAdmissionsWorkbook.title}
+                  </h2>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <a
+                    href={medicalAdmissionsWorkbook.sourceFile}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="border-4 border-black bg-blue-600 px-4 py-2 text-center text-sm font-black text-white hover:bg-blue-700"
+                  >
+                    새 창
+                  </a>
+                  <a
+                    href={medicalAdmissionsWorkbook.sourceFile}
+                    download={medicalAdmissionsWorkbook.downloadName}
+                    className="border-4 border-black bg-black px-4 py-2 text-center text-sm font-black text-white hover:bg-gray-800"
+                  >
+                    다운로드
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {medicalAdmissionsWorkbook.sheets.map((sheet) => (
+                  <button
+                    type="button"
+                    key={sheet.name}
+                    onClick={() => setSelectedMedicalSheetName(sheet.name)}
+                    className={`min-w-20 border-4 border-black px-4 py-2 text-sm font-black ${
+                      activeMedicalSheet?.name === sheet.name
+                        ? "bg-black text-white"
+                        : "bg-white text-black hover:bg-gray-100"
+                    }`}
+                  >
+                    {sheet.name}
+                  </button>
+                ))}
+              </div>
+
+              {activeMedicalSheet ? (
+                <section className="border-4 border-black bg-[#f8f8f8]">
+                  <div className="flex flex-col gap-1 border-b-4 border-black bg-black px-3 py-2 text-white sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-sm font-black">
+                      SHEET: {activeMedicalSheet.name}
+                    </span>
+                    <span className="text-xs font-bold">
+                      ROWS {activeMedicalSheet.rowCount} / COLS{" "}
+                      {activeMedicalSheet.columnCount}
+                    </span>
+                  </div>
+                  <div className="max-h-[70vh] overflow-auto bg-white">
+                    <table className="min-w-full border-collapse text-xs md:text-sm">
+                      <tbody>
+                        {activeMedicalSheet.rows.map((row, rowIndex) => {
+                          const isHeader =
+                            rowIndex < activeMedicalSheet.headerRowCount;
+                          const Cell = isHeader ? "th" : "td";
+
+                          return (
+                            <tr
+                              key={`${activeMedicalSheet.name}-${rowIndex}`}
+                              className={rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                            >
+                              {row.map((cell, columnIndex) => (
+                                <Cell
+                                  key={`${activeMedicalSheet.name}-${rowIndex}-${columnIndex}`}
+                                  className={`min-w-24 border-2 border-black px-2 py-2 align-top ${
+                                    isHeader
+                                      ? "bg-yellow-100 text-center font-black"
+                                      : "font-bold"
+                                  }`}
+                                  style={{ whiteSpace: "pre-line" }}
+                                >
+                                  {cell || "\u00A0"}
+                                </Cell>
+                              ))}
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              ) : (
+                <section className="border-4 border-black bg-white p-8 text-center font-black">
+                  표시할 시트가 없습니다
+                </section>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setView("career")}
+                className="w-full bg-black text-white py-3 font-bold border-4 border-black hover:bg-gray-800"
+              >
+                BACK_TO_CAREER
               </button>
             </div>
           </section>
