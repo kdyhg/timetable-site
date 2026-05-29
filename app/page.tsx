@@ -8,6 +8,11 @@ import {
   type AdmissionDocument,
   type AdmissionRegionFilter,
 } from "./admissions-data";
+import {
+  academicCalendarEvents,
+  type AcademicCalendarEvent,
+  type AcademicSemester,
+} from "./academic-calendar-data";
 import { medicalAdmissionsWorkbook } from "./career-data";
 
 const OFFICE_CODE = process.env.NEXT_PUBLIC_OFFICE_CODE || "C10";
@@ -30,6 +35,7 @@ type NoticesApiResponse = {
   notices?: Notice[];
   error?: string;
 };
+type AcademicSemesterFilter = "all" | AcademicSemester;
 type MedicalDisplayMode = "summary" | "table";
 type MedicalAdmissionType = "all" | "교과" | "학종" | "정시";
 type MedicalCsatFilter = "all" | "with" | "none";
@@ -65,6 +71,7 @@ type ViewType =
   | "timetable"
   | "notice-list"
   | "admin"
+  | "calendar"
   | "career"
   | "meal-board"
   | "medical-admissions"
@@ -110,6 +117,55 @@ const getLocalDateString = () => {
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+};
+
+const parseLocalDate = (dateString: string) => {
+  const [year, month, day] = dateString.split("-").map(Number);
+
+  return new Date(year, month - 1, day);
+};
+
+const addDays = (date: Date, days: number) => {
+  const nextDate = new Date(date);
+  nextDate.setDate(nextDate.getDate() + days);
+
+  return nextDate;
+};
+
+const getEventEndDate = (event: AcademicCalendarEvent) =>
+  parseLocalDate(event.endDate ?? event.date);
+
+const formatAcademicDate = (event: AcademicCalendarEvent) => {
+  const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+  const startDate = parseLocalDate(event.date);
+  const startLabel = `${startDate.getMonth() + 1}월 ${startDate.getDate()}일(${
+    weekdays[startDate.getDay()]
+  })`;
+
+  if (!event.endDate) {
+    return startLabel;
+  }
+
+  const endDate = parseLocalDate(event.endDate);
+  const endLabel = `${endDate.getMonth() + 1}월 ${endDate.getDate()}일(${
+    weekdays[endDate.getDay()]
+  })`;
+
+  return `${startLabel} ~ ${endLabel}`;
+};
+
+const getAcademicMonthLabel = (event: AcademicCalendarEvent) =>
+  `${parseLocalDate(event.date).getMonth() + 1}월`;
+
+const isEventWithinRange = (
+  event: AcademicCalendarEvent,
+  rangeStart: Date,
+  rangeEnd: Date,
+) => {
+  const eventStart = parseLocalDate(event.date);
+  const eventEnd = getEventEndDate(event);
+
+  return eventStart <= rangeEnd && eventEnd >= rangeStart;
 };
 
 const cleanMealMenu = (menu: string) =>
@@ -177,6 +233,8 @@ export default function RetroDashboard() {
   const [selectedDate, setSelectedDate] = useState(getLocalDateString());
   const [dailyMeals, setDailyMeals] = useState<Meal[]>([]);
   const [isMealLoading, setIsMealLoading] = useState(false);
+  const [academicSemesterFilter, setAcademicSemesterFilter] =
+    useState<AcademicSemesterFilter>("all");
 
   const [admissionRegion, setAdmissionRegion] =
     useState<AdmissionRegionFilter>("all");
@@ -355,6 +413,54 @@ export default function RetroDashboard() {
     medicalRecords,
     medicalRegion,
   ]);
+  const upcomingAcademicEvents = useMemo(() => {
+    const today = parseLocalDate(getLocalDateString());
+    const nextWeek = addDays(today, 7);
+
+    return academicCalendarEvents
+      .filter((event) => isEventWithinRange(event, today, nextWeek))
+      .sort(
+        (a, b) =>
+          parseLocalDate(a.date).getTime() - parseLocalDate(b.date).getTime(),
+      );
+  }, []);
+  const filteredAcademicEvents = useMemo(
+    () =>
+      academicCalendarEvents
+        .filter(
+          (event) =>
+            academicSemesterFilter === "all" ||
+            event.semester === academicSemesterFilter,
+        )
+        .sort(
+          (a, b) =>
+            parseLocalDate(a.date).getTime() -
+            parseLocalDate(b.date).getTime(),
+        ),
+    [academicSemesterFilter],
+  );
+  const groupedAcademicEvents = useMemo(() => {
+    const semesterOrder: AcademicSemester[] = ["1학기", "2학기"];
+
+    return semesterOrder
+      .map((semester) => {
+        const semesterEvents = filteredAcademicEvents.filter(
+          (event) => event.semester === semester,
+        );
+        const monthGroups = Array.from(
+          semesterEvents.reduce((groups, event) => {
+            const monthLabel = getAcademicMonthLabel(event);
+            const monthEvents = groups.get(monthLabel) ?? [];
+
+            groups.set(monthLabel, [...monthEvents, event]);
+            return groups;
+          }, new Map<string, AcademicCalendarEvent[]>()),
+        );
+
+        return { semester, monthGroups };
+      })
+      .filter(({ monthGroups }) => monthGroups.length > 0);
+  }, [filteredAcademicEvents]);
 
   const fetchMeal = useCallback(async () => {
     try {
@@ -561,41 +667,196 @@ export default function RetroDashboard() {
 
       <main className="max-w-5xl mx-auto">
         {view === "home" ? (
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <HomeCard
-              label="TIME"
-              title="시간표 조회"
-              subtitle="GET TIMETABLE"
-              color="bg-blue-500 text-white"
-              onClick={() => setView("timetable")}
-            />
-            <HomeCard
-              label="NEWS"
-              title="학급 공지사항"
-              subtitle="CLASS UPDATES"
-              color="bg-yellow-300 text-black"
-              onClick={() => {
-                setView("notice-list");
-                fetchNotices();
-              }}
-            />
-            <HomeCard
-              label="MEAL"
-              title="급식 조회"
-              subtitle="CHECK ALL MEALS"
-              color="bg-[#00ff41] text-black"
-              onClick={() => {
-                setView("meal-board");
-                fetchDailyMeals(selectedDate);
-              }}
-            />
-            <HomeCard
-              label="2028"
-              title="2028 진로진학"
-              subtitle="CAREER GUIDE"
-              color="bg-red-500 text-white"
-              onClick={() => setView("career")}
-            />
+          <section className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+              <HomeCard
+                label="TIME"
+                title="시간표 조회"
+                subtitle="GET TIMETABLE"
+                color="bg-blue-500 text-white"
+                onClick={() => setView("timetable")}
+              />
+              <HomeCard
+                label="NEWS"
+                title="학급 공지사항"
+                subtitle="CLASS UPDATES"
+                color="bg-yellow-300 text-black"
+                onClick={() => {
+                  setView("notice-list");
+                  fetchNotices();
+                }}
+              />
+              <HomeCard
+                label="MEAL"
+                title="급식 조회"
+                subtitle="CHECK ALL MEALS"
+                color="bg-[#00ff41] text-black"
+                onClick={() => {
+                  setView("meal-board");
+                  fetchDailyMeals(selectedDate);
+                }}
+              />
+              <HomeCard
+                label="CAL"
+                title="학사일정"
+                subtitle="SCHOOL CALENDAR"
+                color="bg-cyan-400 text-black"
+                onClick={() => setView("calendar")}
+              />
+              <HomeCard
+                label="2028"
+                title="2028 진로진학"
+                subtitle="CAREER GUIDE"
+                color="bg-red-500 text-white"
+                onClick={() => setView("career")}
+              />
+            </div>
+
+            <section className="border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+              <div className="flex items-center justify-between border-b-4 border-black bg-cyan-400 px-4 py-2 text-xs font-black text-black">
+                <span>UPCOMING_7_DAYS</span>
+                <button
+                  type="button"
+                  onClick={() => setView("calendar")}
+                  className="underline"
+                >
+                  전체보기
+                </button>
+              </div>
+              <div className="grid grid-cols-1 gap-3 p-4 md:grid-cols-2">
+                {upcomingAcademicEvents.length > 0 ? (
+                  upcomingAcademicEvents.map((event) => (
+                    <button
+                      type="button"
+                      key={event.id}
+                      onClick={() => setView("calendar")}
+                      className="border-2 border-black bg-[#f8f8f8] p-3 text-left hover:bg-yellow-50"
+                    >
+                      <span className="block text-[11px] font-black text-gray-500">
+                        {formatAcademicDate(event)}
+                      </span>
+                      <span className="mt-1 block text-sm font-black">
+                        {event.title}
+                      </span>
+                    </button>
+                  ))
+                ) : (
+                  <p className="p-3 text-sm font-bold text-gray-500 md:col-span-2">
+                    근 일주일 안에 예정된 학사일정이 없습니다.
+                  </p>
+                )}
+              </div>
+            </section>
+          </section>
+        ) : view === "calendar" ? (
+          <section className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <div className="bg-cyan-400 text-black px-4 py-2 border-b-4 border-black flex justify-between font-bold text-xs">
+              <span>ACADEMIC_CALENDAR.EXE</span>
+              <button type="button" onClick={resetView}>
+                X
+              </button>
+            </div>
+
+            <div className="p-4 md:p-6 space-y-5">
+              <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <p className="text-xs font-black text-gray-500">
+                    2026학년도 해강고 학사일정
+                  </p>
+                  <h2 className="text-2xl md:text-3xl font-black">
+                    학사일정
+                  </h2>
+                </div>
+                <div className="grid grid-cols-3 border-4 border-black text-sm font-black">
+                  {(["all", "1학기", "2학기"] as AcademicSemesterFilter[]).map(
+                    (filter) => (
+                      <button
+                        type="button"
+                        key={filter}
+                        onClick={() => setAcademicSemesterFilter(filter)}
+                        className={`px-4 py-2 ${
+                          academicSemesterFilter === filter
+                            ? "bg-black text-white"
+                            : "bg-white text-black hover:bg-gray-100"
+                        }`}
+                      >
+                        {filter === "all" ? "전체" : filter}
+                      </button>
+                    ),
+                  )}
+                </div>
+              </div>
+
+              <section className="border-4 border-black">
+                <div className="border-b-4 border-black bg-black px-3 py-2 text-xs font-bold text-white">
+                  UPCOMING {upcomingAcademicEvents.length}
+                </div>
+                <div className="grid grid-cols-1 gap-3 bg-[#f8f8f8] p-4 md:grid-cols-2">
+                  {upcomingAcademicEvents.length > 0 ? (
+                    upcomingAcademicEvents.map((event) => (
+                      <div
+                        key={`calendar-upcoming-${event.id}`}
+                        className="border-2 border-black bg-white p-3"
+                      >
+                        <span className="block text-[11px] font-black text-gray-500">
+                          {formatAcademicDate(event)}
+                        </span>
+                        <span className="mt-1 block text-sm font-black">
+                          {event.title}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm font-bold text-gray-500 md:col-span-2">
+                      근 일주일 안에 예정된 학사일정이 없습니다.
+                    </p>
+                  )}
+                </div>
+              </section>
+
+              {groupedAcademicEvents.map(({ semester, monthGroups }) => (
+                <section key={semester} className="border-4 border-black">
+                  <div className="border-b-4 border-black bg-yellow-300 px-4 py-2 text-sm font-black">
+                    {semester}
+                  </div>
+                  <div className="divide-y-4 divide-black">
+                    {monthGroups.map(([monthLabel, events]) => (
+                      <section
+                        key={`${semester}-${monthLabel}`}
+                        className="grid grid-cols-1 md:grid-cols-[120px_1fr]"
+                      >
+                        <div className="border-b-4 border-black bg-[#f8f8f8] p-4 text-xl font-black md:border-b-0 md:border-r-4">
+                          {monthLabel}
+                        </div>
+                        <div className="divide-y-2 divide-black">
+                          {events.map((event) => (
+                            <div
+                              key={event.id}
+                              className="grid grid-cols-1 gap-2 p-4 md:grid-cols-[220px_1fr]"
+                            >
+                              <time className="text-sm font-black text-gray-600">
+                                {formatAcademicDate(event)}
+                              </time>
+                              <p className="text-sm font-bold md:text-base">
+                                {event.title}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+                    ))}
+                  </div>
+                </section>
+              ))}
+
+              <button
+                type="button"
+                onClick={resetView}
+                className="w-full bg-black text-white py-3 font-bold border-4 border-black hover:bg-gray-800"
+              >
+                BACK_TO_HOME
+              </button>
+            </div>
           </section>
         ) : view === "career" ? (
           <section className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
