@@ -33,7 +33,7 @@ export default function MedicalAdmissionsPage() {
     <>
       <PageHeader title="의약학계열 전형" description="대학별 의약학계열 모집 정보를 요약해서 확인하세요." crumbs={[{ label: "홈", href: "/" }, { label: "2028 진로진학", href: "/career/2028" }, { label: "의약학계열 전형" }]} actions={<a href={medicalAdmissionsWorkbook.sourceFile} download={medicalAdmissionsWorkbook.downloadName} className="notion-button"><Download className="h-4 w-4" /> 원본 엑셀</a>} />
       <div className="mb-5 flex gap-1 overflow-x-auto rounded-lg border border-[#e6e6e6] bg-white p-1">
-        {sheetNames.map((name) => <button key={name} type="button" onClick={() => { setSheetName(name); setExpanded(null); }} className={`min-w-20 rounded-md px-3 py-2 text-sm font-medium ${sheetName === name ? "bg-[#e9e9e7]" : "text-[#787774] hover:bg-[#f3f3f2]"}`}>{name}</button>)}
+        {sheetNames.map((name) => <button key={name} type="button" onClick={() => { setSheetName(name); setExpanded(null); }} className={`min-h-11 min-w-20 rounded-md px-3 py-2 text-sm font-medium ${sheetName === name ? "bg-[#e9e9e7]" : "text-[#787774] hover:bg-[#f3f3f2]"}`}>{name}</button>)}
       </div>
       <label className="relative mb-5 block max-w-md"><Search className="absolute left-3 top-3 h-4 w-4 text-[#a39e98]" /><input className="notion-input w-full pl-9" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="대학명·전형방법 검색" /></label>
       {records.length ? <div className="grid gap-4 lg:grid-cols-2">{records.map((record) => {

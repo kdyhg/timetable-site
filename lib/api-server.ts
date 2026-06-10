@@ -15,7 +15,7 @@ export function requireAdmin(request: NextRequest) {
   if (!client) {
     return {
       error: jsonError(
-        "SUPABASE_SERVICE_ROLE_KEY 환경 변수가 필요합니다.",
+        "SUPABASE_SECRET_KEY 또는 SUPABASE_SERVICE_ROLE_KEY 환경 변수가 필요합니다.",
         503,
       ),
       client: null,

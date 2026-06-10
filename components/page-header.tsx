@@ -17,9 +17,9 @@ export function PageHeader({
   actions?: React.ReactNode;
 }) {
   return (
-    <header className="mb-8">
+    <header className="mb-6 md:mb-8">
       {crumbs.length > 0 && (
-        <nav className="mb-5 flex flex-wrap items-center gap-1 text-xs text-[#787774]">
+        <nav className="mb-4 hidden flex-wrap items-center gap-1 text-xs text-[#787774] sm:flex md:mb-5">
           {crumbs.map((crumb, index) => (
             <span key={`${crumb.label}-${index}`} className="flex items-center gap-1">
               {index > 0 && <ChevronRight className="h-3 w-3" />}
@@ -34,12 +34,12 @@ export function PageHeader({
           ))}
         </nav>
       )}
-      <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-5">
         <div className="max-w-3xl">
           {eyebrow && (
             <p className="mb-2 text-xs font-semibold text-[#787774]">{eyebrow}</p>
           )}
-          <h1 className="text-3xl font-bold leading-tight text-[#191919] md:text-4xl">
+          <h1 className="text-2xl font-bold leading-tight text-[#191919] sm:text-3xl md:text-4xl">
             {title}
           </h1>
           {description && (
@@ -48,7 +48,7 @@ export function PageHeader({
             </p>
           )}
         </div>
-        {actions && <div className="flex shrink-0 flex-wrap gap-2">{actions}</div>}
+        {actions && <div className="flex shrink-0 flex-wrap gap-2 [&>.notion-button]:max-sm:flex-1">{actions}</div>}
       </div>
     </header>
   );

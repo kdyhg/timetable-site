@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-`.env.example`을 참고해 `.env.local`에 환경 변수를 설정합니다. `SUPABASE_SERVICE_ROLE_KEY`와 `ADMIN_PASSWORD`는 서버에서만 사용하며 `NEXT_PUBLIC_` 접두사를 붙이지 않습니다. 기존 관리자 화면의 클라이언트 확인을 위해 배포 환경에는 `NEXT_PUBLIC_ADMIN_PASSWORD`도 같은 값으로 설정합니다.
+`.env.example`을 참고해 `.env.local`에 환경 변수를 설정합니다. 서버 비밀 키는 최신 `SUPABASE_SECRET_KEY`를 권장하며 기존 `SUPABASE_SERVICE_ROLE_KEY`도 지원합니다. 비밀 키와 `ADMIN_PASSWORD`에는 `NEXT_PUBLIC_` 접두사를 붙이지 않습니다. 기존 관리자 화면의 클라이언트 확인을 위해 배포 환경에는 `NEXT_PUBLIC_ADMIN_PASSWORD`도 같은 값으로 설정합니다.
 
 ## Supabase setup
 
@@ -21,6 +21,8 @@ Supabase SQL Editor에서 [`supabase/migrations/20260610_public_class_hub.sql`](
 - 공개 다운로드용 `class-files` Storage 버킷
 
 학생 조회는 공개 RLS 정책을 사용하고 등록·수정·삭제·파일 업로드는 서버의 Service Role 키로 처리합니다.
+
+마이그레이션과 환경변수 설정 후 Vercel Production을 다시 배포합니다. 숨김 관리자 화면의 `서비스 상태`에서 테이블, Storage와 서버 비밀 키 설정을 확인할 수 있습니다.
 
 ## Verification
 

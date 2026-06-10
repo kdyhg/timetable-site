@@ -14,7 +14,6 @@ export default function WeeklyPage() {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [items, setItems] = useState<ClassItem[]>([]);
   const [resources, setResources] = useState<CareerResource[]>([]);
-  const [error, setError] = useState("");
   const start = startOfWeek();
   const end = endOfWeek();
   const today = getLocalDateString();
@@ -31,7 +30,6 @@ export default function WeeklyPage() {
       if (noticeResult.status === "fulfilled") setNotices(noticeResult.value);
       if (itemResult.status === "fulfilled") setItems(itemResult.value);
       if (resourceResult.status === "fulfilled") setResources(resourceResult.value);
-      if ([noticeResult, itemResult, resourceResult].some((result) => result.status === "rejected")) setError("담임 등록 정보 일부를 불러오지 못했습니다.");
     });
   }, []);
 
@@ -43,8 +41,7 @@ export default function WeeklyPage() {
         description="이번 주의 학사일정, 평가·제출, 중요 공지와 진학자료를 자동으로 모았습니다."
         crumbs={[{ label: "홈", href: "/" }, { label: "학교생활" }, { label: "주간 브리핑" }]}
       />
-      {error && <p className="mb-5 rounded-md bg-amber-50 p-3 text-sm text-amber-800">{error}</p>}
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 md:gap-8">
         <section><SectionTitle title="학사일정" />{academic.length ? <div className="notion-card divide-y divide-[#e6e6e6]">{academic.map((event) => <Link href="/school/calendar" key={event.id} className="block p-4 hover:bg-[#fbfbfa]"><p className="text-xs text-[#0075de]">{formatAcademicDate(event)}</p><p className="mt-1 text-sm font-medium">{event.title}</p></Link>)}</div> : <EmptyState title="이번 주 학사일정이 없습니다." />}</section>
         <section><SectionTitle title="평가·제출·준비물" />{weeklyItems.length ? <div className="notion-card divide-y divide-[#e6e6e6]">{weeklyItems.map((item) => <Link href="/school/assessments" key={item.id} className="block p-4 hover:bg-[#fbfbfa]"><CategoryBadge label={item.item_type} /><p className="mt-2 text-sm font-medium">{item.title}</p><p className="mt-1 text-xs text-[#0075de]">{formatDateString(item.date)}{item.subject ? ` · ${item.subject}` : ""}</p></Link>)}</div> : <EmptyState title="이번 주 평가·제출 일정이 없습니다." />}</section>
         <section><SectionTitle title="중요 공지와 마감" />{weeklyNotices.length ? <div className="notion-card divide-y divide-[#e6e6e6]">{weeklyNotices.map((notice) => <article key={notice.id} className="p-4"><CategoryBadge label={notice.category} /><h3 className="mt-2 text-sm font-semibold">{notice.title}</h3>{notice.due_date && <p className="mt-1 text-xs text-[#0075de]">마감 {formatDateString(notice.due_date)}</p>}<ResourceLinks linkUrl={notice.link_url} attachmentUrl={notice.attachment_url} attachmentName={notice.attachment_name} /></article>)}</div> : <EmptyState title="이번 주 중요 공지나 마감이 없습니다." />}</section>

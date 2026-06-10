@@ -25,7 +25,7 @@ export function AttachmentFields({
   const [error, setError] = useState("");
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-4 lg:grid-cols-2">
       <label className="space-y-1.5 text-sm font-medium">
         <span>외부 링크</span>
         <input value={linkUrl} onChange={(event) => onLinkUrl(event.target.value)} className="notion-input w-full font-normal" placeholder="https://..." disabled={disabled} />

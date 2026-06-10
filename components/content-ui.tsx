@@ -35,14 +35,14 @@ export function ResourceLinks({
 }) {
   if (!linkUrl && !attachmentUrl) return null;
   return (
-    <div className="mt-4 flex flex-wrap gap-2">
+    <div className="mt-4 flex flex-wrap gap-2 max-sm:flex-col">
       {linkUrl && (
-        <a href={linkUrl} target="_blank" rel="noreferrer" className="notion-button">
+        <a href={linkUrl} target="_blank" rel="noreferrer" className="notion-button mobile-full-button">
           <ExternalLink className="h-4 w-4" /> 링크 열기
         </a>
       )}
       {attachmentUrl && (
-        <a href={attachmentUrl} target="_blank" rel="noreferrer" className="notion-button">
+        <a href={attachmentUrl} target="_blank" rel="noreferrer" className="notion-button mobile-full-button">
           <Download className="h-4 w-4" /> {attachmentName || "첨부파일"}
         </a>
       )}
@@ -52,7 +52,7 @@ export function ResourceLinks({
 
 export function ClassItemCard({ item }: { item: ClassItem }) {
   return (
-    <article className="notion-card p-5">
+    <article className="notion-card p-4 sm:p-5">
       <div className="flex flex-wrap items-center gap-2">
         <CategoryBadge label={item.item_type} />
         {item.subject && <span className="text-xs font-medium text-[#787774]">{item.subject}</span>}

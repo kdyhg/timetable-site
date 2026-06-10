@@ -33,7 +33,7 @@ function CareerResourceForm() {
 
   return <>
     <PageHeader title={id ? "진학자료 수정" : "진학자료 등록"} description="학생에게 보여줄 담임 설명과 핵심 확인사항을 입력하세요." crumbs={[{ label: "홈", href: "/" }, { label: "관리자", href: "/admin" }, { label: id ? "진학자료 수정" : "진학자료 등록" }]} />
-    <div className="mx-auto max-w-3xl notion-card space-y-5 p-6">
+    <div className="mx-auto max-w-3xl notion-card space-y-5 p-4 sm:p-6">
       <label className="block space-y-1.5 text-sm font-medium"><span>분류</span><select value={form.category} onChange={(event) => set("category", event.target.value)} className="notion-input w-full font-normal">{careerResourceCategories.map((item) => <option key={item}>{item}</option>)}</select></label>
       <label className="block space-y-1.5 text-sm font-medium"><span>제목</span><input value={form.title} onChange={(event) => set("title", event.target.value)} className="notion-input w-full font-normal" /></label>
       <label className="block space-y-1.5 text-sm font-medium"><span>짧은 설명</span><textarea value={form.summary} onChange={(event) => set("summary", event.target.value)} className="notion-input min-h-24 w-full resize-y font-normal" /></label>

@@ -34,9 +34,9 @@ export default function CalendarPage() {
         description="2026학년도 학사일정을 학기와 월별로 확인하세요."
         crumbs={[{ label: "홈", href: "/" }, { label: "학교생활" }, { label: "학사일정" }]}
         actions={
-          <div className="flex rounded-lg border border-[#e6e6e6] bg-white p-1">
+          <div className="flex max-w-full gap-1 overflow-x-auto rounded-lg border border-[#e6e6e6] bg-white p-1">
             {(["all", "1학기", "2학기"] as Filter[]).map((item) => (
-              <button key={item} type="button" onClick={() => setFilter(item)} className={`rounded-md px-3 py-1.5 text-sm font-medium ${filter === item ? "bg-[#e9e9e7]" : "text-[#787774] hover:bg-[#f3f3f2]"}`}>
+              <button key={item} type="button" onClick={() => setFilter(item)} className={`min-h-11 shrink-0 rounded-md px-3 py-1.5 text-sm font-medium ${filter === item ? "bg-[#e9e9e7]" : "text-[#787774] hover:bg-[#f3f3f2]"}`}>
                 {item === "all" ? "전체" : item}
               </button>
             ))}

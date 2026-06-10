@@ -33,7 +33,6 @@ export default function HomePage() {
   const [meal, setMeal] = useState("급식 정보를 불러오는 중입니다.");
   const [notices, setNotices] = useState<Notice[]>([]);
   const [items, setItems] = useState<ClassItem[]>([]);
-  const [managedError, setManagedError] = useState("");
   const todayDate = useMemo(() => parseLocalDate(today), [today]);
   const nextWeek = useMemo(() => addDays(todayDate, 7), [todayDate]);
   const academicToday = academicCalendarEvents.filter((event) =>
@@ -64,9 +63,6 @@ export default function HomePage() {
     ]).then(([noticeResult, itemResult]) => {
       if (noticeResult.status === "fulfilled") setNotices(noticeResult.value);
       if (itemResult.status === "fulfilled") setItems(itemResult.value);
-      if (noticeResult.status === "rejected" || itemResult.status === "rejected") {
-        setManagedError("담임 등록 정보 일부를 불러오지 못했습니다. 학사일정과 급식은 계속 확인할 수 있습니다.");
-      }
     });
   }, [today]);
 
@@ -80,17 +76,11 @@ export default function HomePage() {
             weekday: "long",
           })}
         </p>
-        <h1 className="mt-2 text-3xl font-bold md:text-4xl">오늘의 학급</h1>
+        <h1 className="mt-2 text-2xl font-bold sm:text-3xl md:text-4xl">오늘의 학급</h1>
         <p className="mt-3 text-[15px] text-[#615d59]">
           오늘 해야 할 일과 이번 주의 중요한 안내를 한눈에 확인하세요.
         </p>
       </header>
-
-      {managedError && (
-        <p className="mb-6 rounded-md bg-amber-50 p-3 text-sm text-amber-800">
-          {managedError}
-        </p>
-      )}
 
       {important.length > 0 && (
         <section className="mb-8">
@@ -113,7 +103,7 @@ export default function HomePage() {
         </section>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-[1.35fr_1fr]">
+      <div className="grid gap-8 md:grid-cols-[1.2fr_.8fr]">
         <div className="space-y-8">
           <section>
             <SectionTitle title="오늘 일정" />
