@@ -1,12 +1,9 @@
 "use client";
 
 import { PageHeader } from "@/components/page-header";
-import {
-  studentTimetables,
-  timetableTemplatePath,
-} from "@/app/timetable-data";
+import { validStudentIds } from "@/app/timetable-data";
 import { STUDENT_ID_STORAGE_KEY } from "@/lib/student-tools";
-import { Download, FileSpreadsheet, Search } from "lucide-react";
+import { Download, Search } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -19,7 +16,7 @@ export default function TimetablePage() {
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       const saved = window.localStorage.getItem(STUDENT_ID_STORAGE_KEY);
-      if (saved && studentTimetables[saved]) {
+      if (saved && validStudentIds.includes(saved)) {
         setStudentId(saved);
         setImagePath(`/timetables/${saved}.png`);
         setRemembered(true);
@@ -30,7 +27,7 @@ export default function TimetablePage() {
 
   const search = () => {
     const id = studentId.trim();
-    if (!studentTimetables[id]) {
+    if (!validStudentIds.includes(id)) {
       setError("2학년 10반 학번 5자리를 입력하세요.");
       setImagePath("");
       return;
@@ -45,7 +42,7 @@ export default function TimetablePage() {
     <>
       <PageHeader
         title="시간표"
-        description="학번을 한 번 조회하면 이 기기에만 기억하여 홈에서 현재 교시를 안내합니다."
+        description="학번을 입력해 개인 시간표 이미지를 확인하고 다운로드하세요."
         crumbs={[{ label: "홈", href: "/" }, { label: "학교생활" }, { label: "시간표" }]}
       />
       <div className="mx-auto max-w-2xl">
@@ -66,23 +63,9 @@ export default function TimetablePage() {
           {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
           {remembered && !error && (
             <p className="mt-3 text-sm text-emerald-700">
-              이 기기에 학번을 기억했습니다. 서버에는 저장하지 않습니다.
+              이 기기에 학번을 기억했습니다. 다음 방문에도 바로 표시됩니다.
             </p>
           )}
-        </div>
-        <div className="notion-card mt-5 flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="flex items-center gap-2 text-sm font-semibold">
-              <FileSpreadsheet className="h-4 w-4 text-[#0075de]" />
-              과목 데이터 입력 양식
-            </p>
-            <p className="mt-2 text-xs leading-5 text-[#787774]">
-              과목명 연결 전까지 홈의 현재 교시는 교시와 남은 시간만 표시됩니다.
-            </p>
-          </div>
-          <a href={timetableTemplatePath} download className="notion-button shrink-0">
-            <Download className="h-4 w-4" /> 엑셀 양식
-          </a>
         </div>
         {imagePath && (
           <div className="notion-card mt-5 overflow-hidden p-3">

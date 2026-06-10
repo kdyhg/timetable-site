@@ -1,6 +1,6 @@
 export type TimetableDay = [string, string, string, string, string, string, string];
 
-export type StudentTimetable = [
+export type ClassTimetable = [
   TimetableDay,
   TimetableDay,
   TimetableDay,
@@ -18,22 +18,15 @@ export const periodTimes = [
   { period: 7, start: "15:40", end: "16:30" },
 ] as const;
 
-const emptyDay = (): TimetableDay => ["", "", "", "", "", "", ""];
-const emptyTimetable = (): StudentTimetable => [
-  emptyDay(),
-  emptyDay(),
-  emptyDay(),
-  emptyDay(),
-  emptyDay(),
+export const classTimetable: ClassTimetable = [
+  ["대수", "일본어", "A", "진로독서", "진로", "영어", "B"],
+  ["미술", "미술", "대수", "정보", "C", "스포츠", "문학"],
+  ["영어", "정보", "A", "문학", "HR", "HR", ""],
+  ["C", "B", "영어", "문학", "대수", "일본어", "A"],
+  ["문학", "대수", "B", "일본어", "정보", "C", "영어"],
 ];
 
-export const studentTimetables: Record<string, StudentTimetable> =
-  Object.fromEntries(
-    Array.from({ length: 24 }, (_, index) => [
-      `210${String(index + 1).padStart(2, "0")}`,
-      emptyTimetable(),
-    ]),
-  );
-
-export const timetableTemplatePath =
-  "/timetables/해강고_2학년10반_시간표_입력양식.xlsx";
+export const validStudentIds = Array.from(
+  { length: 24 },
+  (_, index) => `210${String(index + 1).padStart(2, "0")}`,
+);

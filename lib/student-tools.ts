@@ -1,9 +1,5 @@
 import type { AcademicCalendarEvent } from "@/app/academic-calendar-data";
-import {
-  periodTimes,
-  studentTimetables,
-  type StudentTimetable,
-} from "@/app/timetable-data";
+import { classTimetable, periodTimes } from "@/app/timetable-data";
 import { addDays, getLocalDateString, parseLocalDate } from "@/lib/school";
 
 export const STUDENT_ID_STORAGE_KEY = "haegang-student-id";
@@ -16,7 +12,6 @@ export type SchoolTimeState = {
   nextPeriod: number | null;
   nextSubject: string | null;
   remainingMinutes: number | null;
-  studentId: string | null;
 };
 
 const minutesOfDay = (date: Date) => date.getHours() * 60 + date.getMinutes();
@@ -28,23 +23,17 @@ const parseTime = (value: string) => {
 const offDayPattern =
   /공휴일|휴업일|연휴|선거일|어린이날|한글날|성탄절|신정|제헌절/;
 
-const subjectAt = (
-  timetable: StudentTimetable | undefined,
-  weekday: number,
-  period: number | null,
-) => {
-  if (!timetable || weekday < 1 || weekday > 5 || !period) return null;
-  return timetable[weekday - 1][period - 1] || null;
+const subjectAt = (weekday: number, period: number | null) => {
+  if (weekday < 1 || weekday > 5 || !period) return null;
+  return classTimetable[weekday - 1][period - 1].trim() || null;
 };
 
 export function getSchoolTimeState(
   now: Date,
-  studentId: string | null,
   academicEvents: AcademicCalendarEvent[],
 ): SchoolTimeState {
   const weekday = now.getDay();
   const today = getLocalDateString(now);
-  const timetable = studentId ? studentTimetables[studentId] : undefined;
   const offDay =
     weekday === 0 ||
     weekday === 6 ||
@@ -64,42 +53,50 @@ export function getSchoolTimeState(
       nextPeriod: null,
       nextSubject: null,
       remainingMinutes: null,
-      studentId,
     };
   }
 
   const currentMinutes = minutesOfDay(now);
-  for (const item of periodTimes) {
-    const start = parseTime(item.start);
-    const end = parseTime(item.end);
-    if (currentMinutes >= start && currentMinutes < end) {
-      return {
-        status: "class",
-        label: `${item.period}교시 수업 중`,
-        period: item.period,
-        subject: subjectAt(timetable, weekday, item.period),
-        nextPeriod: item.period < 7 ? item.period + 1 : null,
-        nextSubject: subjectAt(
-          timetable,
-          weekday,
-          item.period < 7 ? item.period + 1 : null,
-        ),
-        remainingMinutes: end - currentMinutes,
-        studentId,
-      };
-    }
-    if (currentMinutes < start) {
-      return {
-        status: item.period === 1 ? "before" : "break",
-        label: item.period === 1 ? "수업 시작 전" : "쉬는 시간",
-        period: null,
-        subject: null,
-        nextPeriod: item.period,
-        nextSubject: subjectAt(timetable, weekday, item.period),
-        remainingMinutes: start - currentMinutes,
-        studentId,
-      };
-    }
+  const todaysClasses = periodTimes
+    .map((item) => ({
+      ...item,
+      startMinutes: parseTime(item.start),
+      endMinutes: parseTime(item.end),
+      subject: subjectAt(weekday, item.period),
+    }))
+    .filter((item) => item.subject);
+  const current = todaysClasses.find(
+    (item) =>
+      currentMinutes >= item.startMinutes && currentMinutes < item.endMinutes,
+  );
+
+  if (current) {
+    const next = todaysClasses.find(
+      (item) => item.startMinutes > current.startMinutes,
+    );
+    return {
+      status: "class",
+      label: `${current.period}교시 수업 중`,
+      period: current.period,
+      subject: current.subject,
+      nextPeriod: next?.period ?? null,
+      nextSubject: next?.subject ?? null,
+      remainingMinutes: current.endMinutes - currentMinutes,
+    };
+  }
+
+  const next = todaysClasses.find((item) => item.startMinutes > currentMinutes);
+  if (next) {
+    return {
+      status: next.period === todaysClasses[0]?.period ? "before" : "break",
+      label:
+        next.period === todaysClasses[0]?.period ? "수업 시작 전" : "쉬는 시간",
+      period: null,
+      subject: null,
+      nextPeriod: next.period,
+      nextSubject: next.subject,
+      remainingMinutes: next.startMinutes - currentMinutes,
+    };
   }
 
   return {
@@ -110,7 +107,6 @@ export function getSchoolTimeState(
     nextPeriod: null,
     nextSubject: null,
     remainingMinutes: null,
-    studentId,
   };
 }
 
