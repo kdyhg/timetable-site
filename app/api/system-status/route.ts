@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     for (const table of [
       { id: "notices", label: "공지사항 테이블", name: "notices" },
       { id: "class-items", label: "평가·제출 일정 테이블", name: "class_items" },
-      { id: "career-resources", label: "진학자료 테이블", name: "career_resources" },
+      { id: "roadmap-items", label: "월별 로드맵 테이블", name: "roadmap_items" },
     ]) {
       const { error } = await publicClient.from(table.name).select("id").limit(1);
       checks.push({
@@ -50,7 +50,9 @@ export async function GET(request: NextRequest) {
         label: table.label,
         ok: !error,
         guidance: error
-          ? "Supabase SQL Editor에서 20260610_public_class_hub.sql을 실행하세요."
+          ? table.name === "roadmap_items"
+            ? "Supabase SQL Editor에서 20260611_student_tools.sql을 실행하세요."
+            : "Supabase SQL Editor에서 20260610_public_class_hub.sql을 실행하세요."
           : "",
       });
     }
@@ -58,7 +60,7 @@ export async function GET(request: NextRequest) {
     for (const table of [
       ["notices", "공지사항 테이블"],
       ["class-items", "평가·제출 일정 테이블"],
-      ["career-resources", "진학자료 테이블"],
+      ["roadmap-items", "월별 로드맵 테이블"],
     ]) {
       checks.push({
         id: table[0],

@@ -12,10 +12,11 @@ import {
   Folder,
   GraduationCap,
   Home,
-  Library,
+  Map,
   Menu,
   Newspaper,
   Search,
+  Sparkles,
   Utensils,
   X,
 } from "lucide-react";
@@ -32,6 +33,8 @@ type NavItem = {
 const schoolItems: NavItem[] = [
   { href: "/school/weekly", label: "주간 브리핑", icon: ClipboardCheck },
   { href: "/school/assessments", label: "평가·제출 일정", icon: ClipboardList },
+  { href: "/school/roadmap", label: "고2 월별 로드맵", icon: Map },
+  { href: "/school/tools", label: "학생 도구", icon: Sparkles },
   { href: "/school/timetable", label: "시간표", icon: ClipboardList },
   { href: "/school/meals", label: "급식", icon: Utensils },
   { href: "/school/calendar", label: "학사일정", icon: CalendarDays },
@@ -40,7 +43,6 @@ const schoolItems: NavItem[] = [
 
 const careerItems: NavItem[] = [
   { href: "/career/2028", label: "2028 진로진학", icon: GraduationCap },
-  { href: "/career/2028/guides", label: "진학 가이드·용어사전", icon: Library },
   { href: "/career/2028/admissions", label: "대학별 대입전형", icon: BookOpen },
   { href: "/career/2028/medical-admissions", label: "의약학계열 전형", icon: FileSpreadsheet },
   { href: "/career/2028/recommended-subjects", label: "핵심·권장과목", icon: FileSpreadsheet },
@@ -211,7 +213,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <header className="sticky top-0 z-30 flex min-h-14 items-center border-b border-[#e6e6e6] bg-[#f6f5f4]/95 px-3 backdrop-blur sm:px-4 md:px-6">
           <form onSubmit={search} className="relative mx-auto w-full max-w-xl">
             <Search className="absolute left-3 top-3 h-4 w-4 text-[#a39e98]" />
-            <input value={query} onChange={(event) => setQuery(event.target.value)} className="h-10 w-full rounded-md border border-transparent bg-[#e9e9e7] pl-9 pr-3 text-sm outline-none transition focus:border-[#b5d9f7] focus:bg-white focus:ring-2 focus:ring-[#0075de]/10" placeholder="공지, 일정, 진학자료 검색" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} className="h-10 w-full rounded-md border border-transparent bg-[#e9e9e7] pl-9 pr-3 text-sm outline-none transition focus:border-[#b5d9f7] focus:bg-white focus:ring-2 focus:ring-[#0075de]/10" placeholder="공지, 일정, 대학·학과 검색" />
           </form>
         </header>
         <main className="mx-auto w-full max-w-[1180px] px-3 py-6 pb-28 sm:px-4 md:px-6 md:py-8 md:pb-10 lg:px-8 lg:py-12">

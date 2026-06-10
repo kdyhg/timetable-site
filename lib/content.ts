@@ -44,19 +44,13 @@ export type ClassItem = {
   created_at: string;
 };
 
-export const careerResourceCategories = ["가이드", "용어사전", "자료"] as const;
-export type CareerResourceCategory = (typeof careerResourceCategories)[number];
-
-export type CareerResource = {
+export type RoadmapItem = {
   id: number;
-  category: CareerResourceCategory;
+  month: string;
   title: string;
-  summary: string;
-  key_points: string[];
-  content: string | null;
+  description: string;
+  action_points: string[];
   link_url: string | null;
-  attachment_url: string | null;
-  attachment_name: string | null;
   created_at: string;
 };
 

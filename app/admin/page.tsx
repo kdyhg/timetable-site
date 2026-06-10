@@ -3,7 +3,7 @@
 import { CategoryBadge } from "@/components/content-ui";
 import { PageHeader } from "@/components/page-header";
 import { parseApiResponse } from "@/lib/client-api";
-import type { CareerResource, ClassItem, Notice } from "@/lib/content";
+import type { ClassItem, Notice, RoadmapItem } from "@/lib/content";
 import { clearAdminPassword, getAdminPassword, setAdminPassword } from "@/lib/notices";
 import {
   AlertTriangle,
@@ -36,21 +36,21 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [notices, setNotices] = useState<Notice[]>([]);
   const [items, setItems] = useState<ClassItem[]>([]);
-  const [resources, setResources] = useState<CareerResource[]>([]);
+  const [roadmaps, setRoadmaps] = useState<RoadmapItem[]>([]);
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
   const [checkingStatus, setCheckingStatus] = useState(false);
 
   const load = useCallback(async () => {
     setError("");
-    const [noticeResult, itemResult, resourceResult] = await Promise.allSettled([
+    const [noticeResult, itemResult, roadmapResult] = await Promise.allSettled([
         parseApiResponse<Notice[]>(fetch("/api/notices", { cache: "no-store" })),
         parseApiResponse<ClassItem[]>(fetch("/api/class-items", { cache: "no-store" })),
-        parseApiResponse<CareerResource[]>(fetch("/api/career-resources", { cache: "no-store" })),
+        parseApiResponse<RoadmapItem[]>(fetch("/api/roadmap-items", { cache: "no-store" })),
       ]);
     if (noticeResult.status === "fulfilled") setNotices(noticeResult.value);
     if (itemResult.status === "fulfilled") setItems(itemResult.value);
-    if (resourceResult.status === "fulfilled") setResources(resourceResult.value);
-    if ([noticeResult, itemResult, resourceResult].some((result) => result.status === "rejected")) {
+    if (roadmapResult.status === "fulfilled") setRoadmaps(roadmapResult.value);
+    if ([noticeResult, itemResult, roadmapResult].some((result) => result.status === "rejected")) {
       setError("일부 관리 데이터를 불러오지 못했습니다. 아래 서비스 상태를 확인하세요.");
     }
   }, []);
@@ -101,11 +101,11 @@ export default function AdminPage() {
   const sections = [
     { title: "공지사항", rows: notices, newHref: "/admin/notices/new", api: "/api/notices", edit: (id: number) => `/admin/notices/new?id=${id}`, label: (row: Notice) => row.title, badge: (row: Notice) => row.category },
     { title: "평가·제출·준비물", rows: items, newHref: "/admin/class-items/new", api: "/api/class-items", edit: (id: number) => `/admin/class-items/new?id=${id}`, label: (row: ClassItem) => `${row.date} · ${row.title}`, badge: (row: ClassItem) => row.item_type },
-    { title: "진학 가이드·용어사전", rows: resources, newHref: "/admin/career-resources/new", api: "/api/career-resources", edit: (id: number) => `/admin/career-resources/new?id=${id}`, label: (row: CareerResource) => row.title, badge: (row: CareerResource) => row.category },
+    { title: "고2 월별 로드맵", rows: roadmaps, newHref: "/admin/roadmap-items/new", api: "/api/roadmap-items", edit: (id: number) => `/admin/roadmap-items/new?id=${id}`, label: (row: RoadmapItem) => `${row.month} · ${row.title}`, badge: (row: RoadmapItem) => `${Number(row.month.slice(5))}월` },
   ];
 
   return <>
-    <PageHeader title="콘텐츠 관리" description="학생 화면에 표시할 공지, 일정과 진학자료를 관리합니다." crumbs={[{ label: "홈", href: "/" }, { label: "관리자" }]} actions={<button type="button" onClick={() => { clearAdminPassword(); setAuthenticated(false); }} className="notion-button"><LogOut className="h-4 w-4" /> 로그아웃</button>} />
+    <PageHeader title="콘텐츠 관리" description="학생 화면에 표시할 공지, 일정과 월별 로드맵을 관리합니다." crumbs={[{ label: "홈", href: "/" }, { label: "관리자" }]} actions={<button type="button" onClick={() => { clearAdminPassword(); setAuthenticated(false); }} className="notion-button"><LogOut className="h-4 w-4" /> 로그아웃</button>} />
     {error && <p className="mb-5 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>}
     <section className="mb-8">
       <div className="mb-3 flex items-center justify-between gap-3">
@@ -135,7 +135,7 @@ export default function AdminPage() {
             처음 설정하는 순서
           </summary>
           <ol className="list-decimal space-y-2 border-t border-[#e6e6e6] px-8 py-4 text-sm leading-6 text-[#615d59]">
-            <li>Supabase SQL Editor에서 <b>20260610_public_class_hub.sql</b> 전체를 실행합니다.</li>
+            <li>Supabase SQL Editor에서 <b>20260610_public_class_hub.sql</b>과 <b>20260611_student_tools.sql</b>을 실행합니다.</li>
             <li>Vercel Production 환경에 Supabase 서버 비밀 키와 관리자 비밀번호를 설정합니다.</li>
             <li>Vercel에서 최신 Production 배포를 다시 배포합니다.</li>
             <li>배포 후 이 화면에서 <b>다시 확인</b>을 누릅니다.</li>

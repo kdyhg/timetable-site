@@ -3,7 +3,6 @@ import { academicCalendarEvents } from "@/app/academic-calendar-data";
 import { admissionDocuments } from "@/app/admissions-data";
 import { medicalAdmissionsWorkbook } from "@/app/career-data";
 import recommendationData from "@/app/data/recommended-subjects.json";
-import { staticCareerResources } from "@/app/career-guides-data";
 import { jsonData } from "@/lib/api-server";
 import { getPublicSupabase } from "@/lib/supabase-server";
 
@@ -101,25 +100,12 @@ export async function GET(request: NextRequest) {
       );
   });
 
-  staticCareerResources
-    .filter((row) => includes([row.title, row.summary, row.content, ...row.key_points], query))
-    .slice(0, 12)
-    .forEach((row) =>
-      add({
-        id: `static-resource-${row.id}`,
-        type: `진학 ${row.category}`,
-        title: row.title,
-        description: row.summary,
-        href: "/career/2028/guides",
-      }),
-    );
-
   const supabase = getPublicSupabase();
   if (supabase) {
-    const [notices, items, resources] = await Promise.all([
+    const [notices, items, roadmaps] = await Promise.all([
       supabase.from("notices").select("*").limit(100),
       supabase.from("class_items").select("*").limit(100),
-      supabase.from("career_resources").select("*").limit(100),
+      supabase.from("roadmap_items").select("*").limit(100),
     ]);
     (notices.data ?? [])
       .filter(
@@ -152,18 +138,18 @@ export async function GET(request: NextRequest) {
           href: "/school/assessments",
         }),
       );
-    (resources.data ?? [])
+    (roadmaps.data ?? [])
       .filter((row) =>
-        includes([row.title, row.summary, ...(row.key_points ?? []), row.content], query),
+        includes([row.month, row.title, row.description, ...(row.action_points ?? [])], query),
       )
       .slice(0, 12)
       .forEach((row) =>
         add({
-          id: `resource-${row.id}`,
-          type: `진학 ${row.category}`,
+          id: `roadmap-${row.id}`,
+          type: "월별 로드맵",
           title: row.title,
-          description: row.summary,
-          href: "/career/2028/guides",
+          description: `${row.month} · ${row.description}`,
+          href: "/school/roadmap",
         }),
       );
   }

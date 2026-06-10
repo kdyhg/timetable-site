@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     default: "해강고 2학년 10반",
     template: "%s | 해강고 2학년 10반",
   },
-  description: "시간표, 급식, 공지사항, 학사일정, 2028 진로진학 자료실",
+  description: "시간표, 급식, 공지사항, 학사일정, 고2 로드맵과 2028 진로진학 자료실",
 };
 
 export default function RootLayout({
