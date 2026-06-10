@@ -1,20 +1,16 @@
-export type Notice = {
-  id: number;
-  title: string;
-  content: string;
-  created_at: string;
-  is_important: boolean;
-};
+export type { Notice } from "@/lib/content";
+import type { Notice } from "@/lib/content";
 
 export type NoticesApiResponse = {
   notices?: Notice[];
+  data?: Notice[];
   error?: string;
 };
 
 export async function parseNoticeResponse(response: Response) {
   const body = (await response.json().catch(() => ({}))) as NoticesApiResponse;
   if (!response.ok) throw new Error(body.error || `HTTP ${response.status}`);
-  return body;
+  return { ...body, notices: body.notices ?? body.data ?? [] };
 }
 
 export const getAdminPassword = () =>

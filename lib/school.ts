@@ -27,6 +27,35 @@ export const addDays = (date: Date, days: number) => {
   return nextDate;
 };
 
+export const startOfWeek = (date = new Date()) => {
+  const start = parseLocalDate(getLocalDateString(date));
+  const day = start.getDay();
+  start.setDate(start.getDate() - (day === 0 ? 6 : day - 1));
+  return start;
+};
+
+export const endOfWeek = (date = new Date()) => addDays(startOfWeek(date), 6);
+
+export const isDateInRange = (
+  dateString: string,
+  start: Date,
+  end: Date,
+  endDateString?: string | null,
+) => {
+  const itemStart = parseLocalDate(dateString);
+  const itemEnd = parseLocalDate(endDateString || dateString);
+  return itemStart <= end && itemEnd >= start;
+};
+
+export const formatDateString = (dateString: string, endDate?: string | null) =>
+  formatAcademicDate({
+    id: dateString,
+    semester: "1학기",
+    date: dateString,
+    endDate: endDate || undefined,
+    title: "",
+  });
+
 export const cleanMealMenu = (menu: string) =>
   menu.replace(/[0-9.]/g, "").replace(/<br\/?>/g, ", ");
 

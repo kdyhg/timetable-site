@@ -1,97 +1,180 @@
 "use client";
 
 import { academicCalendarEvents } from "@/app/academic-calendar-data";
-import { PageHeader } from "@/components/page-header";
+import { NoticeMeta } from "@/components/content-ui";
 import { EmptyState, SectionTitle } from "@/components/ui";
-import { fetchMeals, formatAcademicDate, getLocalDateString, upcomingEvents } from "@/lib/school";
-import type { Notice } from "@/lib/notices";
+import { parseApiResponse } from "@/lib/client-api";
+import {
+  isVisibleNotice,
+  type ClassItem,
+  type Notice,
+} from "@/lib/content";
+import {
+  addDays,
+  fetchMeals,
+  formatAcademicDate,
+  formatDateString,
+  getLocalDateString,
+  isDateInRange,
+  parseLocalDate,
+  upcomingEvents,
+} from "@/lib/school";
 import {
   CalendarDays,
   ChevronRight,
-  ClipboardList,
-  GraduationCap,
-  Newspaper,
+  ClipboardCheck,
   Utensils,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-const shortcuts = [
-  { href: "/school/timetable", label: "시간표", description: "학생별 시간표 조회", icon: ClipboardList },
-  { href: "/school/meals", label: "급식", description: "날짜별 급식 조회", icon: Utensils },
-  { href: "/school/calendar", label: "학사일정", description: "학기별 학교 일정", icon: CalendarDays },
-  { href: "/school/notices", label: "공지사항", description: "학급 공지 확인", icon: Newspaper },
-  { href: "/career/2028", label: "2028 진로진학", description: "대입 자료 모음", icon: GraduationCap },
-];
-
 export default function HomePage() {
+  const today = getLocalDateString();
   const [meal, setMeal] = useState("급식 정보를 불러오는 중입니다.");
   const [notices, setNotices] = useState<Notice[]>([]);
-  const events = useMemo(() => upcomingEvents(academicCalendarEvents), []);
+  const [items, setItems] = useState<ClassItem[]>([]);
+  const [managedError, setManagedError] = useState("");
+  const todayDate = useMemo(() => parseLocalDate(today), [today]);
+  const nextWeek = useMemo(() => addDays(todayDate, 7), [todayDate]);
+  const academicToday = academicCalendarEvents.filter((event) =>
+    isDateInRange(event.date, todayDate, todayDate, event.endDate),
+  );
+  const academicUpcoming = upcomingEvents(academicCalendarEvents).filter(
+    (event) => !academicToday.some((todayEvent) => todayEvent.id === event.id),
+  );
+  const important = notices.filter(
+    (notice) => notice.is_important && isVisibleNotice(notice, today),
+  );
+  const upcomingItems = items.filter((item) =>
+    isDateInRange(item.date, todayDate, nextWeek, item.end_date),
+  );
 
   useEffect(() => {
-    fetchMeals(getLocalDateString())
-      .then((rows) => setMeal(rows.map((row) => row.menu).join(" · ") || "오늘은 급식 정보가 없습니다."))
+    fetchMeals(today)
+      .then((rows) =>
+        setMeal(
+          rows.map((row) => `${row.type} · ${row.menu}`).join("\n") ||
+            "오늘은 급식 정보가 없습니다.",
+        ),
+      )
       .catch(() => setMeal("급식 정보를 불러오지 못했습니다."));
-    fetch("/api/notices", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((body) => setNotices(body.notices?.slice(0, 4) ?? []))
-      .catch(() => setNotices([]));
-  }, []);
+    Promise.allSettled([
+      parseApiResponse<Notice[]>(fetch("/api/notices", { cache: "no-store" })),
+      parseApiResponse<ClassItem[]>(fetch("/api/class-items", { cache: "no-store" })),
+    ]).then(([noticeResult, itemResult]) => {
+      if (noticeResult.status === "fulfilled") setNotices(noticeResult.value);
+      if (itemResult.status === "fulfilled") setItems(itemResult.value);
+      if (noticeResult.status === "rejected" || itemResult.status === "rejected") {
+        setManagedError("담임 등록 정보 일부를 불러오지 못했습니다. 학사일정과 급식은 계속 확인할 수 있습니다.");
+      }
+    });
+  }, [today]);
 
   return (
     <>
-      <PageHeader
-        eyebrow="2026학년도"
-        title="해강고 2학년 10반"
-        description="학교생활과 진로진학 자료를 한곳에서 확인하세요."
-      />
+      <header className="mb-8">
+        <p className="text-sm font-semibold text-[#0075de]">
+          {new Date().toLocaleDateString("ko-KR", {
+            month: "long",
+            day: "numeric",
+            weekday: "long",
+          })}
+        </p>
+        <h1 className="mt-2 text-3xl font-bold md:text-4xl">오늘의 학급</h1>
+        <p className="mt-3 text-[15px] text-[#615d59]">
+          오늘 해야 할 일과 이번 주의 중요한 안내를 한눈에 확인하세요.
+        </p>
+      </header>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        {shortcuts.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Link key={item.href} href={item.href} className="notion-card group p-4 hover:bg-[#fbfbfa]">
-              <Icon className="h-5 w-5 text-[#0075de]" />
-              <h2 className="mt-5 text-sm font-semibold">{item.label}</h2>
-              <p className="mt-1 text-xs leading-5 text-[#787774]">{item.description}</p>
-              <ChevronRight className="mt-4 h-4 w-4 text-[#a39e98] transition-transform group-hover:translate-x-1" />
-            </Link>
-          );
-        })}
-      </div>
+      {managedError && (
+        <p className="mb-6 rounded-md bg-amber-50 p-3 text-sm text-amber-800">
+          {managedError}
+        </p>
+      )}
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-[1.35fr_1fr]">
-        <section>
-          <SectionTitle title="다가오는 7일" action={<Link href="/school/calendar" className="text-sm font-medium text-[#0075de]">전체 일정</Link>} />
-          {events.length ? (
-            <div className="notion-card divide-y divide-[#e6e6e6]">
-              {events.map((event) => (
-                <Link href="/school/calendar" key={event.id} className="flex gap-4 p-4 hover:bg-[#fbfbfa]">
-                  <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-[#0075de]" />
-                  <div>
-                    <p className="text-xs font-medium text-[#787774]">{formatAcademicDate(event)}</p>
-                    <p className="mt-1 text-sm font-medium">{event.title}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : <EmptyState title="다가오는 일정이 없습니다." />}
+      {important.length > 0 && (
+        <section className="mb-8">
+          <SectionTitle title="중요 공지" />
+          <div className="notion-card divide-y divide-[#e6e6e6] border-l-4 border-l-red-500">
+            {important.slice(0, 3).map((notice) => (
+              <Link
+                href="/school/notices"
+                key={notice.id}
+                className="block p-4 hover:bg-[#fbfbfa]"
+              >
+                <NoticeMeta notice={notice} />
+                <p className="mt-2 font-semibold">{notice.title}</p>
+                <p className="mt-1 line-clamp-2 text-sm leading-6 text-[#615d59]">
+                  {notice.content}
+                </p>
+              </Link>
+            ))}
+          </div>
         </section>
+      )}
+
+      <div className="grid gap-8 lg:grid-cols-[1.35fr_1fr]">
+        <div className="space-y-8">
+          <section>
+            <SectionTitle title="오늘 일정" />
+            {academicToday.length || upcomingItems.filter((item) => item.date === today).length ? (
+              <div className="notion-card divide-y divide-[#e6e6e6]">
+                {academicToday.map((event) => (
+                  <Link href="/school/calendar" key={event.id} className="flex gap-3 p-4 hover:bg-[#fbfbfa]">
+                    <CalendarDays className="mt-0.5 h-4 w-4 text-[#0075de]" />
+                    <div><p className="text-xs text-[#787774]">학사일정</p><p className="mt-1 text-sm font-medium">{event.title}</p></div>
+                  </Link>
+                ))}
+                {upcomingItems.filter((item) => item.date === today).map((item) => (
+                  <Link href="/school/assessments" key={item.id} className="flex gap-3 p-4 hover:bg-[#fbfbfa]">
+                    <ClipboardCheck className="mt-0.5 h-4 w-4 text-[#0075de]" />
+                    <div><p className="text-xs text-[#787774]">{item.item_type}{item.subject ? ` · ${item.subject}` : ""}</p><p className="mt-1 text-sm font-medium">{item.title}</p></div>
+                  </Link>
+                ))}
+              </div>
+            ) : <EmptyState title="오늘 등록된 일정이 없습니다." />}
+          </section>
+
+          <section>
+            <SectionTitle
+              title="앞으로 7일"
+              action={<Link href="/school/weekly" className="text-sm font-medium text-[#0075de]">주간 브리핑</Link>}
+            />
+            {academicUpcoming.length || upcomingItems.length ? (
+              <div className="notion-card divide-y divide-[#e6e6e6]">
+                {upcomingItems.slice(0, 6).map((item) => (
+                  <Link href="/school/assessments" key={`item-${item.id}`} className="flex items-center justify-between gap-4 p-4 hover:bg-[#fbfbfa]">
+                    <div><p className="text-xs text-[#787774]">{item.item_type}{item.subject ? ` · ${item.subject}` : ""}</p><p className="mt-1 text-sm font-medium">{item.title}</p></div>
+                    <span className="shrink-0 text-xs text-[#0075de]">{formatDateString(item.date)}</span>
+                  </Link>
+                ))}
+                {academicUpcoming.slice(0, 5).map((event) => (
+                  <Link href="/school/calendar" key={`academic-${event.id}`} className="flex items-center justify-between gap-4 p-4 hover:bg-[#fbfbfa]">
+                    <div><p className="text-xs text-[#787774]">학사일정</p><p className="mt-1 text-sm font-medium">{event.title}</p></div>
+                    <span className="shrink-0 text-xs text-[#0075de]">{formatAcademicDate(event)}</span>
+                  </Link>
+                ))}
+              </div>
+            ) : <EmptyState title="앞으로 7일 안에 등록된 일정이 없습니다." />}
+          </section>
+        </div>
 
         <div className="space-y-8">
           <section>
             <SectionTitle title="오늘의 급식" action={<Link href="/school/meals" className="text-sm font-medium text-[#0075de]">급식 보기</Link>} />
-            <div className="notion-card p-5 text-sm leading-7 text-[#31302e]">{meal}</div>
+            <div className="notion-card p-5">
+              <Utensils className="h-5 w-5 text-[#0075de]" />
+              <p className="mt-4 whitespace-pre-line text-sm leading-7 text-[#31302e]">{meal}</p>
+            </div>
           </section>
           <section>
             <SectionTitle title="최근 공지" action={<Link href="/school/notices" className="text-sm font-medium text-[#0075de]">전체 공지</Link>} />
             {notices.length ? (
               <div className="notion-card divide-y divide-[#e6e6e6]">
-                {notices.map((notice) => (
-                  <Link href="/school/notices" key={notice.id} className="block p-4 hover:bg-[#fbfbfa]">
-                    <p className="text-sm font-medium">{notice.is_important ? "중요 · " : ""}{notice.title}</p>
-                    <p className="mt-1 text-xs text-[#a39e98]">{new Date(notice.created_at).toLocaleDateString("ko-KR")}</p>
+                {notices.filter((notice) => isVisibleNotice(notice, today)).slice(0, 5).map((notice) => (
+                  <Link href="/school/notices" key={notice.id} className="flex items-center justify-between gap-3 p-4 hover:bg-[#fbfbfa]">
+                    <div><NoticeMeta notice={notice} /><p className="mt-2 text-sm font-medium">{notice.title}</p></div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-[#a39e98]" />
                   </Link>
                 ))}
               </div>

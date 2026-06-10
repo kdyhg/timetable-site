@@ -1,8 +1,14 @@
 import { PageHeader } from "@/components/page-header";
-import { BookOpen, ChevronRight, FileSpreadsheet, ListChecks } from "lucide-react";
+import { BookOpen, ChevronRight, FileSpreadsheet, Library, ListChecks } from "lucide-react";
 import Link from "next/link";
 
 const resources = [
+  {
+    href: "/career/2028/guides",
+    title: "진학 가이드·용어사전",
+    description: "수시 이해하기, 교과 선택 방법과 어려운 진학 용어 설명",
+    icon: Library,
+  },
   {
     href: "/career/2028/admissions",
     title: "대학별 대입전형",
@@ -32,7 +38,7 @@ export default function CareerIndexPage() {
         description="대입전형 시행계획과 전공별 과목 선택 자료를 확인하세요."
         crumbs={[{ label: "홈", href: "/" }, { label: "2028 진로진학" }]}
       />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         {resources.map((resource) => {
           const Icon = resource.icon;
           return (

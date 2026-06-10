@@ -3,7 +3,7 @@
 import recommendationData from "@/app/data/recommended-subjects.json";
 import { PageHeader } from "@/components/page-header";
 import { EmptyState } from "@/components/ui";
-import { Download, FilterX, Search } from "lucide-react";
+import { Download, FilterX, Scale, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
 type Recommendation = (typeof recommendationData.records)[number];
@@ -52,6 +52,7 @@ export default function RecommendedSubjectsPage() {
   const [region, setRegion] = useState("all");
   const [university, setUniversity] = useState("all");
   const [selectedId, setSelectedId] = useState(recommendationData.records[0]?.id ?? "");
+  const [comparisonIds, setComparisonIds] = useState<string[]>([]);
 
   const areas = useMemo(() => [...new Set(recommendationData.records.map((row) => row.area))].sort((a, b) => a.localeCompare(b, "ko")), []);
   const regions = useMemo(() => [...new Set(recommendationData.records.filter((row) => area === "all" || row.area === area).map((row) => row.region))].sort((a, b) => a.localeCompare(b, "ko")), [area]);
@@ -64,6 +65,7 @@ export default function RecommendedSubjectsPage() {
     });
   }, [area, query, region, university]);
   const selected = filtered.find((row) => row.id === selectedId) ?? filtered[0];
+  const comparisons = recommendationData.records.filter((row) => comparisonIds.includes(row.id));
 
   const reset = () => {
     setQuery("");
@@ -71,6 +73,16 @@ export default function RecommendedSubjectsPage() {
     setRegion("all");
     setUniversity("all");
     setSelectedId(recommendationData.records[0]?.id ?? "");
+  };
+
+  const toggleComparison = (id: string) => {
+    setComparisonIds((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : current.length < 3
+          ? [...current, id]
+          : current,
+    );
   };
 
   return (
@@ -90,6 +102,32 @@ export default function RecommendedSubjectsPage() {
         <button type="button" onClick={reset} className="notion-button" title="필터 초기화"><FilterX className="h-4 w-4" /><span className="lg:hidden">초기화</span></button>
       </div>
 
+      {comparisons.length > 0 && (
+        <section className="notion-card mb-5 overflow-hidden">
+          <div className="flex items-center justify-between border-b border-[#e6e6e6] p-4">
+            <div className="flex items-center gap-2">
+              <Scale className="h-4 w-4 text-[#0075de]" />
+              <h2 className="text-sm font-semibold">대학·학과 비교 {comparisons.length}/3</h2>
+            </div>
+            <button type="button" onClick={() => setComparisonIds([])} className="text-xs font-medium text-[#787774] hover:text-[#191919]">비교 초기화</button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-[760px] w-full border-collapse text-sm">
+              <thead><tr className="bg-[#fbfbfa] text-left">{["항목", ...comparisons.map((row) => `${row.university} ${row.department}`)].map((label) => <th key={label} className="border-b border-r border-[#e6e6e6] p-3 font-semibold last:border-r-0">{label}</th>)}</tr></thead>
+              <tbody>
+                {[
+                  ["지역", (row: Recommendation) => `${row.area} · ${row.region}`],
+                  ["계열", (row: Recommendation) => row.departmentGroup || "-"],
+                  ["핵심과목", (row: Recommendation) => row.coreSubjects || "-"],
+                  ["권장과목", (row: Recommendation) => row.recommendedSubjects || "-"],
+                  ["비고", (row: Recommendation) => row.note || "-"],
+                ].map(([label, getter]) => <tr key={label as string}><th className="w-24 border-b border-r border-[#e6e6e6] bg-[#fbfbfa] p-3 text-left align-top text-xs font-semibold text-[#787774]">{label as string}</th>{comparisons.map((row) => <td key={`${label}-${row.id}`} className="max-w-72 whitespace-pre-line border-b border-r border-[#e6e6e6] p-3 align-top leading-6 last:border-r-0">{(getter as (row: Recommendation) => string)(row)}</td>)}</tr>)}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
       <p className="mb-3 text-sm text-[#787774]">검색 결과 {filtered.length.toLocaleString()}개 · 전체 {recommendationData.sourceRowCount.toLocaleString()}개 모집단위</p>
       {filtered.length ? (
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(360px,.75fr)]">
@@ -105,6 +143,12 @@ export default function RecommendedSubjectsPage() {
                     </div>
                     <p className="mt-3 line-clamp-2 text-xs leading-5 text-[#787774]">핵심과목 · {record.coreSubjects || "별도 제시 없음"}</p>
                   </button>
+                  <div className={`flex justify-end border-t border-[#e6e6e6] px-3 py-2 ${active ? "bg-[#f1f1ef]" : "bg-white"}`}>
+                    <button type="button" onClick={() => toggleComparison(record.id)} disabled={!comparisonIds.includes(record.id) && comparisonIds.length >= 3} className="notion-button min-h-8 px-2 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-40">
+                      {comparisonIds.includes(record.id) ? <X className="h-3.5 w-3.5" /> : <Scale className="h-3.5 w-3.5" />}
+                      {comparisonIds.includes(record.id) ? "비교 제외" : "비교 담기"}
+                    </button>
+                  </div>
                   {active && <div className="border-t border-[#e6e6e6] bg-white lg:hidden"><DetailPanel record={record} embedded /></div>}
                 </div>
               );

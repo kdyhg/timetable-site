@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 해강고 2학년 10반 학급 안내 허브
 
-## Getting Started
+학생 로그인 없이 시간표, 급식, 공지, 학사일정, 평가·제출 일정과 2028 진로진학 자료를 확인하는 공개형 Next.js 사이트입니다. 담임은 사이드바 하단의 숨김 진입점으로 관리자 화면에 들어가 관리형 콘텐츠를 등록합니다.
 
-First, run the development server:
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`.env.example`을 참고해 `.env.local`에 환경 변수를 설정합니다. `SUPABASE_SERVICE_ROLE_KEY`와 `ADMIN_PASSWORD`는 서버에서만 사용하며 `NEXT_PUBLIC_` 접두사를 붙이지 않습니다. 기존 관리자 화면의 클라이언트 확인을 위해 배포 환경에는 `NEXT_PUBLIC_ADMIN_PASSWORD`도 같은 값으로 설정합니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Supabase setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Supabase SQL Editor에서 [`supabase/migrations/20260610_public_class_hub.sql`](supabase/migrations/20260610_public_class_hub.sql)을 실행합니다. 이 마이그레이션은 다음 항목을 추가합니다.
 
-## Learn More
+- 공지 분류, 마감일, 게시기간, 링크와 첨부파일 정보
+- 시험·수행평가·제출·준비물용 `class_items`
+- 진학 가이드·용어사전용 `career_resources`
+- 공개 다운로드용 `class-files` Storage 버킷
 
-To learn more about Next.js, take a look at the following resources:
+학생 조회는 공개 RLS 정책을 사용하고 등록·수정·삭제·파일 업로드는 서버의 Service Role 키로 처리합니다.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Verification
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lint
+npm run build
+```
