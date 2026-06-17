@@ -3,8 +3,46 @@ import type { AcademicCalendarEvent } from "@/app/academic-calendar-data";
 export const OFFICE_CODE = process.env.NEXT_PUBLIC_OFFICE_CODE || "C10";
 export const SCHOOL_CODE = process.env.NEXT_PUBLIC_SCHOOL_CODE || "7150404";
 
-export type Meal = { type: string; menu: string };
-type MealApiRow = { MMEAL_SC_NM: string; DDISH_NM: string };
+export const allergenLabels: Record<number, string> = {
+  1: "난류",
+  2: "우유",
+  3: "메밀",
+  4: "땅콩",
+  5: "대두",
+  6: "밀",
+  7: "고등어",
+  8: "게",
+  9: "새우",
+  10: "돼지고기",
+  11: "복숭아",
+  12: "토마토",
+  13: "아황산류",
+  14: "호두",
+  15: "닭고기",
+  16: "쇠고기",
+  17: "오징어",
+  18: "조개류",
+  19: "잣",
+};
+
+export type Meal = {
+  type: string;
+  menuItems: string[];
+  allergenNumbers: number[];
+  allergenNames: string[];
+  calorie: string;
+  nutrition: string[];
+  origin: string[];
+  loadDate: string;
+};
+type MealApiRow = {
+  MMEAL_SC_NM: string;
+  DDISH_NM: string;
+  ORPLC_INFO?: string;
+  CAL_INFO?: string;
+  NTR_INFO?: string;
+  LOAD_DTM?: string;
+};
 type MealApiResponse = {
   mealServiceDietInfo?: [unknown, { row: MealApiRow[] }];
 };
@@ -56,8 +94,56 @@ export const formatDateString = (dateString: string, endDate?: string | null) =>
     title: "",
   });
 
-export const cleanMealMenu = (menu: string) =>
-  menu.replace(/[0-9.]/g, "").replace(/<br\/?>/g, ", ");
+const splitHtmlLines = (value = "") =>
+  value
+    .split(/<br\s*\/?>/gi)
+    .map((line) => line.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim())
+    .filter((line) => line && !/^비고\s*:\s*$/.test(line));
+
+const formatNeisDate = (value = "") =>
+  value.length === 8
+    ? `${value.slice(0, 4)}.${value.slice(4, 6)}.${value.slice(6)}`
+    : value;
+
+const parseMealMenu = (menu: string) => {
+  const allergenSet = new Set<number>();
+  const menuItems = splitHtmlLines(menu)
+    .map((line) => {
+      const withoutSchoolMarks = line.replace(/\((?:해강|해|강)\)/g, " ");
+      const withoutAllergenNumbers = withoutSchoolMarks.replace(
+        /\(([\d.\s]+)\)/g,
+        (_, numbers: string) => {
+          numbers
+            .split(".")
+            .map((number) => Number(number.trim()))
+            .filter((number) => Number.isInteger(number) && allergenLabels[number])
+            .forEach((number) => allergenSet.add(number));
+          return " ";
+        },
+      );
+
+      return withoutAllergenNumbers.replace(/\s+/g, " ").trim();
+    })
+    .filter(Boolean);
+
+  const allergenNumbers = Array.from(allergenSet).sort((a, b) => a - b);
+
+  return {
+    menuItems,
+    allergenNumbers,
+    allergenNames: allergenNumbers.map((number) => allergenLabels[number]),
+  };
+};
+
+export const cleanMealMenu = (menu: string) => parseMealMenu(menu).menuItems.join(", ");
+
+export const formatMealAllergenWarning = (
+  meal: Pick<Meal, "type" | "allergenNames">,
+  dateLabel = "오늘",
+) =>
+  meal.allergenNames.length
+    ? `${dateLabel} ${meal.type}에는 ${meal.allergenNames.join(", ")}가 포함될 수 있어요.`
+    : `${meal.type}에는 표시된 알레르기 정보가 없습니다.`;
 
 export async function fetchMeals(dateString: string): Promise<Meal[]> {
   const formattedDate = dateString.replace(/-/g, "");
@@ -67,10 +153,20 @@ export async function fetchMeals(dateString: string): Promise<Meal[]> {
   const data = (await response.json()) as MealApiResponse;
 
   return data.mealServiceDietInfo
-    ? data.mealServiceDietInfo[1].row.map((row) => ({
-        type: row.MMEAL_SC_NM,
-        menu: cleanMealMenu(row.DDISH_NM),
-      }))
+    ? data.mealServiceDietInfo[1].row.map((row) => {
+        const parsedMenu = parseMealMenu(row.DDISH_NM);
+
+        return {
+          type: row.MMEAL_SC_NM,
+          menuItems: parsedMenu.menuItems,
+          allergenNumbers: parsedMenu.allergenNumbers,
+          allergenNames: parsedMenu.allergenNames,
+          calorie: row.CAL_INFO || "",
+          nutrition: splitHtmlLines(row.NTR_INFO),
+          origin: splitHtmlLines(row.ORPLC_INFO),
+          loadDate: formatNeisDate(row.LOAD_DTM),
+        };
+      })
     : [];
 }
 

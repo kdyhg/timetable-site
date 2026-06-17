@@ -15,10 +15,12 @@ import {
 import {
   addDays,
   fetchMeals,
+  formatMealAllergenWarning,
   formatAcademicDate,
   formatDateString,
   getLocalDateString,
   isDateInRange,
+  type Meal,
   parseLocalDate,
   upcomingEvents,
 } from "@/lib/school";
@@ -35,7 +37,8 @@ import { useEffect, useMemo, useState } from "react";
 
 export default function HomePage() {
   const today = getLocalDateString();
-  const [meal, setMeal] = useState("급식 정보를 불러오는 중입니다.");
+  const [meals, setMeals] = useState<Meal[]>([]);
+  const [mealStatus, setMealStatus] = useState("급식 정보를 불러오는 중입니다.");
   const [notices, setNotices] = useState<Notice[]>([]);
   const [items, setItems] = useState<ClassItem[]>([]);
   const [roadmaps, setRoadmaps] = useState<RoadmapItem[]>([]);
@@ -58,13 +61,14 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchMeals(today)
-      .then((rows) =>
-        setMeal(
-          rows.map((row) => `${row.type} · ${row.menu}`).join("\n") ||
-            "오늘은 급식 정보가 없습니다.",
-        ),
-      )
-      .catch(() => setMeal("급식 정보를 불러오지 못했습니다."));
+      .then((rows) => {
+        setMeals(rows);
+        setMealStatus(rows.length ? "" : "오늘은 급식 정보가 없습니다.");
+      })
+      .catch(() => {
+        setMeals([]);
+        setMealStatus("급식 정보를 불러오지 못했습니다.");
+      });
     Promise.allSettled([
       parseApiResponse<Notice[]>(fetch("/api/notices", { cache: "no-store" })),
       parseApiResponse<ClassItem[]>(fetch("/api/class-items", { cache: "no-store" })),
@@ -260,9 +264,32 @@ export default function HomePage() {
             />
             <div className="notion-card p-5">
               <Utensils className="h-5 w-5 text-[#0075de]" />
-              <p className="mt-4 whitespace-pre-line text-sm leading-7 text-[#31302e]">
-                {meal}
-              </p>
+              {meals.length ? (
+                <div className="mt-4 space-y-4">
+                  {meals.map((meal) => (
+                    <div key={meal.type} className="border-t border-[#e6e6e6] pt-4 first:border-t-0 first:pt-0">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-sm font-semibold">{meal.type}</p>
+                        {meal.calorie && (
+                          <span className="rounded-full bg-[#f6f5f4] px-2.5 py-1 text-xs text-[#615d59]">
+                            {meal.calorie}
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-2 text-sm leading-7 text-[#31302e]">
+                        {meal.menuItems.join(", ") || "메뉴 정보가 없습니다."}
+                      </p>
+                      <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
+                        {formatMealAllergenWarning(meal)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-4 whitespace-pre-line text-sm leading-7 text-[#31302e]">
+                  {mealStatus}
+                </p>
+              )}
             </div>
           </section>
           <section>
