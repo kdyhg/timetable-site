@@ -41,6 +41,20 @@ const payload = (body: Record<string, unknown>) => {
   };
 };
 
+type NoticePayload = ReturnType<typeof payload>;
+
+const isMissingImagePositionError = (error: { message?: string } | null) =>
+  Boolean(
+    error?.message?.includes("image_position") &&
+      error.message.includes("schema cache"),
+  );
+
+const withoutImagePosition = (notice: NoticePayload) => {
+  const { image_position, ...fallbackNotice } = notice;
+  void image_position;
+  return fallbackNotice;
+};
+
 export async function GET() {
   const supabase = getPublicSupabase();
   if (!supabase) return jsonError("Supabase 환경 변수가 설정되어 있지 않습니다.");
@@ -76,7 +90,16 @@ export async function POST(request: NextRequest) {
     return jsonError("제목과 내용을 입력하세요.", 400);
   }
   const { error } = await admin.client.from("notices").insert([notice]);
-  if (error) return jsonError(error.message);
+  if (error) {
+    if (isMissingImagePositionError(error)) {
+      const { error: fallbackError } = await admin.client
+        .from("notices")
+        .insert([withoutImagePosition(notice)]);
+      if (!fallbackError) return jsonData({ ok: true }, 201);
+      return jsonError(fallbackError.message);
+    }
+    return jsonError(error.message);
+  }
   return jsonData({ ok: true }, 201);
 }
 
@@ -94,7 +117,17 @@ export async function PATCH(request: NextRequest) {
     return jsonError("제목과 내용을 입력하세요.", 400);
   }
   const { error } = await admin.client.from("notices").update(notice).eq("id", id);
-  if (error) return jsonError(error.message);
+  if (error) {
+    if (isMissingImagePositionError(error)) {
+      const { error: fallbackError } = await admin.client
+        .from("notices")
+        .update(withoutImagePosition(notice))
+        .eq("id", id);
+      if (!fallbackError) return jsonData({ ok: true });
+      return jsonError(fallbackError.message);
+    }
+    return jsonError(error.message);
+  }
   return jsonData({ ok: true });
 }
 
