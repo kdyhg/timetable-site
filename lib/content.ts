@@ -10,6 +10,9 @@ export const noticeCategories = [
 
 export type NoticeCategory = (typeof noticeCategories)[number];
 
+export const noticeImagePositions = ["top", "bottom", "hidden"] as const;
+export type NoticeImagePosition = (typeof noticeImagePositions)[number];
+
 export type Notice = {
   id: number;
   title: string;
@@ -23,6 +26,7 @@ export type Notice = {
   link_url: string | null;
   attachment_url: string | null;
   attachment_name: string | null;
+  image_position: NoticeImagePosition;
 };
 
 export const classItemTypes = ["시험", "수행평가", "제출", "준비물"] as const;

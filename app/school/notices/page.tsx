@@ -1,6 +1,11 @@
 "use client";
 
-import { NoticeMeta, ResourceLinks } from "@/components/content-ui";
+import {
+  NoticeBodyWithImage,
+  NoticeImageIndicator,
+  NoticeMeta,
+  ResourceLinks,
+} from "@/components/content-ui";
 import { PageHeader } from "@/components/page-header";
 import { EmptyState } from "@/components/ui";
 import { parseApiResponse } from "@/lib/client-api";
@@ -32,7 +37,10 @@ function NoticeList({
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <NoticeMeta notice={notice} />
-              <h2 className="mt-3 break-words font-semibold">{notice.title}</h2>
+              <h2 className="mt-3 flex min-w-0 flex-wrap items-center gap-2 break-words font-semibold">
+                <span>{notice.title}</span>
+                <NoticeImageIndicator notice={notice} />
+              </h2>
               <p className="mt-1 text-xs text-[#a39e98]">
                 {new Date(notice.created_at).toLocaleDateString("ko-KR")}
               </p>
@@ -48,9 +56,7 @@ function NoticeList({
               </button>
             )}
           </div>
-          <p className="mt-4 whitespace-pre-wrap break-words text-sm leading-7 text-[#31302e]">
-            {notice.content}
-          </p>
+          <NoticeBodyWithImage notice={notice} />
           <ResourceLinks
             linkUrl={notice.link_url}
             attachmentUrl={notice.attachment_url}

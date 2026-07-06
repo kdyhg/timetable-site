@@ -1,6 +1,6 @@
-import type { ClassItem, Notice } from "@/lib/content";
+import type { ClassItem, Notice, NoticeImagePosition } from "@/lib/content";
 import { formatDateString } from "@/lib/school";
-import { Download, ExternalLink } from "lucide-react";
+import { Download, ExternalLink, Image as ImageIcon } from "lucide-react";
 
 const tones: Record<string, string> = {
   중요: "bg-red-50 text-red-700",
@@ -24,6 +24,105 @@ export function CategoryBadge({ label }: { label: string }) {
     </span>
   );
 }
+
+export const isImageAttachment = (
+  attachmentUrl?: string | null,
+  attachmentName?: string | null,
+) => {
+  if (!attachmentUrl) return false;
+  const value = `${attachmentName ?? ""} ${attachmentUrl ?? ""}`.toLowerCase();
+  return /\.(avif|gif|jpe?g|png|webp)(?:[?#]\S*)?(?:\s|$)/i.test(value);
+};
+
+export function NoticeImageIndicator({ notice }: { notice: Notice }) {
+  if (!isImageAttachment(notice.attachment_url, notice.attachment_name)) return null;
+
+  return (
+    <span
+      aria-label="사진 첨부"
+      title="사진 첨부"
+      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#e8f3ff] text-[#0075de]"
+    >
+      <ImageIcon className="h-3.5 w-3.5" aria-hidden="true" />
+    </span>
+  );
+}
+
+export function NoticeImagePreview({
+  notice,
+  className = "",
+}: {
+  notice: Notice;
+  className?: string;
+}) {
+  if (!isImageAttachment(notice.attachment_url, notice.attachment_name)) return null;
+
+  return (
+    <a
+      href={notice.attachment_url ?? undefined}
+      target="_blank"
+      rel="noreferrer"
+      className={`mt-4 block overflow-hidden rounded-lg border border-[#e6e6e6] bg-[#fbfbfa] ${className}`}
+    >
+      <img
+        src={notice.attachment_url ?? ""}
+        alt={notice.attachment_name || `${notice.title} 첨부 사진`}
+        className="max-h-[520px] w-full object-contain"
+      />
+    </a>
+  );
+}
+
+export const stripNoticePhotoMarkers = (content: string) =>
+  content.replace(/\[사진\]/g, "").trim();
+
+function NoticeText({ content }: { content: string }) {
+  if (!content) return null;
+
+  return (
+    <p className="whitespace-pre-wrap break-words text-sm leading-7 text-[#31302e]">
+      {content}
+    </p>
+  );
+}
+
+export function NoticeBodyWithImage({ notice }: { notice: Notice }) {
+  const hasImage = isImageAttachment(notice.attachment_url, notice.attachment_name);
+  const position: NoticeImagePosition = notice.image_position ?? "bottom";
+
+  if (!hasImage || position === "hidden") {
+    return (
+      <div className="mt-4">
+        <NoticeText content={stripNoticePhotoMarkers(notice.content)} />
+      </div>
+    );
+  }
+
+  const marker = "[사진]";
+  const markerIndex = notice.content.indexOf(marker);
+  if (markerIndex >= 0) {
+    const before = stripNoticePhotoMarkers(notice.content.slice(0, markerIndex));
+    const after = stripNoticePhotoMarkers(notice.content.slice(markerIndex + marker.length));
+
+    return (
+      <div className="mt-4 space-y-4">
+        <NoticeText content={before} />
+        <NoticeImagePreview notice={notice} className="mt-0" />
+        <NoticeText content={after} />
+      </div>
+    );
+  }
+
+  const body = stripNoticePhotoMarkers(notice.content);
+  return (
+    <div className="mt-4 space-y-4">
+      {position === "top" && <NoticeImagePreview notice={notice} className="mt-0" />}
+      <NoticeText content={body} />
+      {position === "bottom" && <NoticeImagePreview notice={notice} className="mt-0" />}
+    </div>
+  );
+}
+
 export function ResourceLinks({
   linkUrl,
   attachmentUrl,
@@ -34,6 +133,7 @@ export function ResourceLinks({
   attachmentName?: string | null;
 }) {
   if (!linkUrl && !attachmentUrl) return null;
+  const imageAttachment = isImageAttachment(attachmentUrl, attachmentName);
   return (
     <div className="mt-4 flex flex-wrap gap-2 max-sm:flex-col">
       {linkUrl && (
@@ -43,7 +143,8 @@ export function ResourceLinks({
       )}
       {attachmentUrl && (
         <a href={attachmentUrl} target="_blank" rel="noreferrer" className="notion-button mobile-full-button">
-          <Download className="h-4 w-4" /> {attachmentName || "첨부파일"}
+          {imageAttachment ? <ImageIcon className="h-4 w-4" /> : <Download className="h-4 w-4" />}
+          {imageAttachment ? "원본 이미지 열기" : attachmentName || "첨부파일"}
         </a>
       )}
     </div>

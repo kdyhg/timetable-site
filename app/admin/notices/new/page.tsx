@@ -1,11 +1,12 @@
 "use client";
 
 import { AttachmentFields } from "@/components/admin-fields";
+import { isImageAttachment } from "@/components/content-ui";
 import { PageHeader } from "@/components/page-header";
 import { adminHeaders, parseApiResponse } from "@/lib/client-api";
-import { noticeCategories, type Notice, type NoticeCategory } from "@/lib/content";
+import { noticeCategories, type Notice, type NoticeCategory, type NoticeImagePosition } from "@/lib/content";
 import { getAdminPassword } from "@/lib/notices";
-import { Save } from "lucide-react";
+import { Image as ImageIcon, Save } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
@@ -14,14 +15,15 @@ function NoticeForm() {
   const params = useSearchParams();
   const id = params.get("id");
   const [password, setPassword] = useState("");
-  const [form, setForm] = useState({ title: "", content: "", category: "일반" as NoticeCategory, is_important: false, due_date: "", publish_start: "", publish_end: "", link_url: "", attachment_url: "", attachment_name: "" });
+  const [form, setForm] = useState({ title: "", content: "", category: "일반" as NoticeCategory, is_important: false, due_date: "", publish_start: "", publish_end: "", link_url: "", attachment_url: "", attachment_name: "", image_position: "bottom" as NoticeImagePosition });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const set = (key: keyof typeof form, value: string | boolean) => setForm((current) => ({ ...current, [key]: value }));
+  const hasImageAttachment = Boolean(form.attachment_url) && isImageAttachment(form.attachment_url, form.attachment_name);
 
   useEffect(() => {
     const current = getAdminPassword(); if (!current) { router.replace("/admin"); return; } setPassword(current);
-    if (id) parseApiResponse<Notice[]>(fetch("/api/notices", { cache: "no-store" })).then((rows) => { const row = rows.find((item) => item.id === Number(id)); if (row) setForm({ title: row.title, content: row.content, category: row.category, is_important: row.is_important, due_date: row.due_date || "", publish_start: row.publish_start || "", publish_end: row.publish_end || "", link_url: row.link_url || "", attachment_url: row.attachment_url || "", attachment_name: row.attachment_name || "" }); });
+    if (id) parseApiResponse<Notice[]>(fetch("/api/notices", { cache: "no-store" })).then((rows) => { const row = rows.find((item) => item.id === Number(id)); if (row) setForm({ title: row.title, content: row.content, category: row.category, is_important: row.is_important, due_date: row.due_date || "", publish_start: row.publish_start || "", publish_end: row.publish_end || "", link_url: row.link_url || "", attachment_url: row.attachment_url || "", attachment_name: row.attachment_name || "", image_position: row.image_position || "bottom" }); });
   }, [id, router]);
 
   const save = async () => {
@@ -39,6 +41,30 @@ function NoticeForm() {
       <textarea value={form.content} onChange={(event) => set("content", event.target.value)} className="notion-input min-h-56 w-full resize-y" placeholder="공지 내용" disabled={saving} />
       <div className="grid gap-4 lg:grid-cols-3">{[["due_date", "마감일"], ["publish_start", "게시 시작일"], ["publish_end", "게시 종료일"]].map(([key, label]) => <label key={key} className="space-y-1.5 text-sm font-medium"><span>{label}</span><input type="date" value={form[key as "due_date"]} onChange={(event) => set(key as keyof typeof form, event.target.value)} className="notion-input w-full font-normal" /></label>)}</div>
       <AttachmentFields password={password} linkUrl={form.link_url} onLinkUrl={(value) => set("link_url", value)} attachmentUrl={form.attachment_url} attachmentName={form.attachment_name} onAttachment={(url, name) => setForm((current) => ({ ...current, attachment_url: url, attachment_name: name }))} disabled={saving} />
+      <div className="rounded-lg border border-[#e6e6e6] bg-[#fbfbfa] p-4">
+        <div className="flex items-start gap-2">
+          <ImageIcon className="mt-0.5 h-4 w-4 text-[#0075de]" />
+          <div>
+            <p className="text-sm font-semibold">사진 본문 표시</p>
+            <p className="mt-1 text-xs leading-5 text-[#787774]">
+              이미지 파일을 첨부하면 공지 본문에도 표시됩니다. 본문에 [사진]을 입력하면 선택 위치보다 그 자리에 우선 표시됩니다.
+            </p>
+          </div>
+        </div>
+        <label className="mt-4 block space-y-1.5 text-sm font-medium">
+          <span>사진 표시 위치</span>
+          <select value={form.image_position} onChange={(event) => set("image_position", event.target.value as NoticeImagePosition)} className="notion-input w-full font-normal" disabled={saving || !hasImageAttachment}>
+            <option value="top">본문 위</option>
+            <option value="bottom">본문 아래</option>
+            <option value="hidden">본문에는 표시하지 않음</option>
+          </select>
+        </label>
+        {hasImageAttachment && (
+          <a href={form.attachment_url} target="_blank" rel="noreferrer" className="mt-4 block overflow-hidden rounded-lg border border-[#e6e6e6] bg-white">
+            <img src={form.attachment_url} alt={form.attachment_name || "첨부 사진 미리보기"} className="max-h-56 w-full object-contain" />
+          </a>
+        )}
+      </div>
       {error && <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>}<button type="button" onClick={save} disabled={saving} className="notion-button notion-button-primary w-full disabled:opacity-50"><Save className="h-4 w-4" /> {saving ? "저장 중..." : "공지 저장"}</button>
     </div>
   </>;

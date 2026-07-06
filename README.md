@@ -20,6 +20,11 @@ Supabase SQL Editor에서 [`supabase/migrations/20260610_public_class_hub.sql`](
 - 진학 가이드·용어사전용 `career_resources`
 - 공개 다운로드용 `class-files` Storage 버킷
 
+추가 기능을 반영하려면 다음 마이그레이션도 순서대로 실행합니다.
+
+- [`supabase/migrations/20260611_student_tools.sql`](supabase/migrations/20260611_student_tools.sql): 고2 월별 로드맵
+- [`supabase/migrations/20260706_notice_image_position.sql`](supabase/migrations/20260706_notice_image_position.sql): 공지 사진 본문 표시 위치
+
 학생 조회는 공개 RLS 정책을 사용하고 등록·수정·삭제·파일 업로드는 서버의 Service Role 키로 처리합니다.
 
 마이그레이션과 환경변수 설정 후 Vercel Production을 다시 배포합니다. 숨김 관리자 화면의 `서비스 상태`에서 테이블, Storage와 서버 비밀 키 설정을 확인할 수 있습니다.

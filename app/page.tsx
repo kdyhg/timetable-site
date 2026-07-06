@@ -3,7 +3,11 @@
 import { academicCalendarEvents } from "@/app/academic-calendar-data";
 import { CurrentPeriodCard } from "@/components/current-period-card";
 import { ExamFocusCard } from "@/components/exam-focus-card";
-import { NoticeMeta } from "@/components/content-ui";
+import {
+  NoticeImageIndicator,
+  NoticeMeta,
+  stripNoticePhotoMarkers,
+} from "@/components/content-ui";
 import { EmptyState, SectionTitle } from "@/components/ui";
 import { parseApiResponse } from "@/lib/client-api";
 import {
@@ -147,9 +151,12 @@ export default function HomePage() {
                 className="block p-4 hover:bg-[#fbfbfa]"
               >
                 <NoticeMeta notice={notice} />
-                <p className="mt-2 font-semibold">{notice.title}</p>
+                <p className="mt-2 flex min-w-0 flex-wrap items-center gap-2 font-semibold">
+                  <span>{notice.title}</span>
+                  <NoticeImageIndicator notice={notice} />
+                </p>
                 <p className="mt-1 line-clamp-2 text-sm leading-6 text-[#615d59]">
-                  {notice.content}
+                  {stripNoticePhotoMarkers(notice.content)}
                 </p>
               </Link>
             ))}
@@ -312,9 +319,12 @@ export default function HomePage() {
                       key={notice.id}
                       className="flex items-center justify-between gap-3 p-4 hover:bg-[#fbfbfa]"
                     >
-                      <div>
+                      <div className="min-w-0">
                         <NoticeMeta notice={notice} />
-                        <p className="mt-2 text-sm font-medium">{notice.title}</p>
+                        <p className="mt-2 flex min-w-0 flex-wrap items-center gap-2 text-sm font-medium">
+                          <span>{notice.title}</span>
+                          <NoticeImageIndicator notice={notice} />
+                        </p>
                       </div>
                       <ChevronRight className="h-4 w-4 shrink-0 text-[#a39e98]" />
                     </Link>

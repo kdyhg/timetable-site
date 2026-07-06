@@ -1,6 +1,10 @@
 import { NextRequest } from "next/server";
 import { jsonData, jsonError, parseId, requireAdmin } from "@/lib/api-server";
-import { noticeCategories } from "@/lib/content";
+import {
+  noticeCategories,
+  noticeImagePositions,
+  type NoticeImagePosition,
+} from "@/lib/content";
 import {
   cleanText,
   getPublicSupabase,
@@ -17,6 +21,11 @@ const payload = (body: Record<string, unknown>) => {
     : body.is_important === true
       ? "중요"
       : "일반";
+  const image_position: NoticeImagePosition = noticeImagePositions.includes(
+    body.image_position as never,
+  )
+    ? (body.image_position as NoticeImagePosition)
+    : "bottom";
   return {
     title,
     content,
@@ -28,6 +37,7 @@ const payload = (body: Record<string, unknown>) => {
     link_url: nullableText(body.link_url),
     attachment_url: nullableText(body.attachment_url),
     attachment_name: nullableText(body.attachment_name),
+    image_position,
   };
 };
 
@@ -50,6 +60,7 @@ export async function GET() {
       link_url: notice.link_url ?? null,
       attachment_url: notice.attachment_url ?? null,
       attachment_name: notice.attachment_name ?? null,
+      image_position: notice.image_position ?? "bottom",
     })),
   );
 }
