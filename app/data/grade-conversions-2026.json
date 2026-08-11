@@ -1,0 +1,2415 @@
+{
+  "sourceUrl": "https://jinhakai.pen.go.kr/entrance/gradeConversion",
+  "baseYear": "2026",
+  "sourceScale": 5,
+  "targetScale": 9,
+  "retrievedAt": "2026-08-11",
+  "rules": [
+    {
+      "source": 1,
+      "min": 1,
+      "max": 1.22,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.01,
+      "min": 1.128218,
+      "max": 1.228218,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.02,
+      "min": 1.143548,
+      "max": 1.243548,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.03,
+      "min": 1.157921,
+      "max": 1.257921,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.04,
+      "min": 1.167822,
+      "max": 1.267822,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.05,
+      "min": 1.17449,
+      "max": 1.27449,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.06,
+      "min": 1.207426,
+      "max": 1.307426,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.07,
+      "min": 1.316337,
+      "max": 1.416337,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.08,
+      "min": 1.39,
+      "max": 1.49,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.09,
+      "min": 1.455263,
+      "max": 1.555263,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.1,
+      "min": 1.517308,
+      "max": 1.617308,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.11,
+      "min": 1.552151,
+      "max": 1.652151,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.12,
+      "min": 1.563861,
+      "max": 1.663861,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.13,
+      "min": 1.628161,
+      "max": 1.728161,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.14,
+      "min": 1.671649,
+      "max": 1.771649,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.15,
+      "min": 1.723196,
+      "max": 1.823196,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.16,
+      "min": 1.728846,
+      "max": 1.828846,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.17,
+      "min": 1.814078,
+      "max": 1.914078,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.18,
+      "min": 1.815979,
+      "max": 1.915979,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.19,
+      "min": 1.823874,
+      "max": 1.923874,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.2,
+      "min": 1.828505,
+      "max": 1.928505,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.21,
+      "min": 1.84899,
+      "max": 1.94899,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.22,
+      "min": 1.871569,
+      "max": 1.971569,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.23,
+      "min": 1.888776,
+      "max": 1.988776,
+      "targetGrade": 2
+    },
+    {
+      "source": 1.24,
+      "min": 1.929167,
+      "max": 2.029167,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.25,
+      "min": 1.939583,
+      "max": 2.039583,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.26,
+      "min": 1.971277,
+      "max": 2.071277,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.27,
+      "min": 1.986364,
+      "max": 2.086364,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.28,
+      "min": 1.99,
+      "max": 2.09,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.29,
+      "min": 2.0125,
+      "max": 2.1125,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.3,
+      "min": 2.031633,
+      "max": 2.131633,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.31,
+      "min": 2.039109,
+      "max": 2.139109,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.32,
+      "min": 2.04901,
+      "max": 2.14901,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.33,
+      "min": 2.088889,
+      "max": 2.188889,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.34,
+      "min": 2.09433,
+      "max": 2.19433,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.35,
+      "min": 2.141489,
+      "max": 2.241489,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.36,
+      "min": 2.14802,
+      "max": 2.24802,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.37,
+      "min": 2.166981,
+      "max": 2.266981,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.38,
+      "min": 2.186364,
+      "max": 2.286364,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.39,
+      "min": 2.197706,
+      "max": 2.297706,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.4,
+      "min": 2.207732,
+      "max": 2.307732,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.41,
+      "min": 2.24703,
+      "max": 2.34703,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.42,
+      "min": 2.263725,
+      "max": 2.363725,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.43,
+      "min": 2.286634,
+      "max": 2.386634,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.44,
+      "min": 2.305769,
+      "max": 2.405769,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.45,
+      "min": 2.311905,
+      "max": 2.411905,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.46,
+      "min": 2.325,
+      "max": 2.425,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.47,
+      "min": 2.332353,
+      "max": 2.432353,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.48,
+      "min": 2.359524,
+      "max": 2.459524,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.49,
+      "min": 2.363793,
+      "max": 2.463793,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.5,
+      "min": 2.404545,
+      "max": 2.504545,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.51,
+      "min": 2.414286,
+      "max": 2.514286,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.52,
+      "min": 2.434536,
+      "max": 2.534536,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.53,
+      "min": 2.439796,
+      "max": 2.539796,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.54,
+      "min": 2.459804,
+      "max": 2.559804,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.55,
+      "min": 2.464851,
+      "max": 2.564851,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.56,
+      "min": 2.483981,
+      "max": 2.583981,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.57,
+      "min": 2.506701,
+      "max": 2.606701,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.58,
+      "min": 2.536207,
+      "max": 2.636207,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.59,
+      "min": 2.558247,
+      "max": 2.658247,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.6,
+      "min": 2.573762,
+      "max": 2.673762,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.61,
+      "min": 2.588298,
+      "max": 2.688298,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.62,
+      "min": 2.597619,
+      "max": 2.697619,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.63,
+      "min": 2.616667,
+      "max": 2.716667,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.64,
+      "min": 2.627419,
+      "max": 2.727419,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.65,
+      "min": 2.660526,
+      "max": 2.760526,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.66,
+      "min": 2.665596,
+      "max": 2.765596,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.67,
+      "min": 2.7,
+      "max": 2.8,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.68,
+      "min": 2.702688,
+      "max": 2.802688,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.69,
+      "min": 2.723585,
+      "max": 2.823585,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.7,
+      "min": 2.745699,
+      "max": 2.845699,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.71,
+      "min": 2.7625,
+      "max": 2.8625,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.72,
+      "min": 2.774742,
+      "max": 2.874742,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.73,
+      "min": 2.78871,
+      "max": 2.88871,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.74,
+      "min": 2.81,
+      "max": 2.91,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.75,
+      "min": 2.823684,
+      "max": 2.923684,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.76,
+      "min": 2.851961,
+      "max": 2.951961,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.77,
+      "min": 2.867526,
+      "max": 2.967526,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.78,
+      "min": 2.88617,
+      "max": 2.98617,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.79,
+      "min": 2.9,
+      "max": 3,
+      "targetGrade": 3
+    },
+    {
+      "source": 1.8,
+      "min": 2.913636,
+      "max": 3.013636,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.81,
+      "min": 2.929798,
+      "max": 3.029798,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.82,
+      "min": 2.930952,
+      "max": 3.030952,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.83,
+      "min": 2.977778,
+      "max": 3.077778,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.84,
+      "min": 2.985294,
+      "max": 3.085294,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.85,
+      "min": 3.009406,
+      "max": 3.109406,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.86,
+      "min": 3.02,
+      "max": 3.12,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.87,
+      "min": 3.039109,
+      "max": 3.139109,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.88,
+      "min": 3.05,
+      "max": 3.15,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.89,
+      "min": 3.057527,
+      "max": 3.157527,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.9,
+      "min": 3.073711,
+      "max": 3.173711,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.91,
+      "min": 3.102381,
+      "max": 3.202381,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.92,
+      "min": 3.138119,
+      "max": 3.238119,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.93,
+      "min": 3.155607,
+      "max": 3.255607,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.94,
+      "min": 3.17449,
+      "max": 3.27449,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.95,
+      "min": 3.17549,
+      "max": 3.27549,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.96,
+      "min": 3.202336,
+      "max": 3.302336,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.97,
+      "min": 3.202336,
+      "max": 3.302336,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.98,
+      "min": 3.231553,
+      "max": 3.331553,
+      "targetGrade": 4
+    },
+    {
+      "source": 1.99,
+      "min": 3.232828,
+      "max": 3.332828,
+      "targetGrade": 4
+    },
+    {
+      "source": 2,
+      "min": 3.300515,
+      "max": 3.400515,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.01,
+      "min": 3.302381,
+      "max": 3.402381,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.02,
+      "min": 3.326344,
+      "max": 3.426344,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.03,
+      "min": 3.33,
+      "max": 3.43,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.04,
+      "min": 3.35,
+      "max": 3.45,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.05,
+      "min": 3.35404,
+      "max": 3.45404,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.06,
+      "min": 3.37268,
+      "max": 3.47268,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.07,
+      "min": 3.393299,
+      "max": 3.493299,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.08,
+      "min": 3.413918,
+      "max": 3.513918,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.09,
+      "min": 3.435437,
+      "max": 3.535437,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.1,
+      "min": 3.454854,
+      "max": 3.554854,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.11,
+      "min": 3.467241,
+      "max": 3.567241,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.12,
+      "min": 3.486082,
+      "max": 3.586082,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.13,
+      "min": 3.506604,
+      "max": 3.606604,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.14,
+      "min": 3.517568,
+      "max": 3.617568,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.15,
+      "min": 3.546154,
+      "max": 3.646154,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.16,
+      "min": 3.55,
+      "max": 3.65,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.17,
+      "min": 3.595161,
+      "max": 3.695161,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.18,
+      "min": 3.603061,
+      "max": 3.703061,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.19,
+      "min": 3.613366,
+      "max": 3.713366,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.2,
+      "min": 3.630851,
+      "max": 3.730851,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.21,
+      "min": 3.641489,
+      "max": 3.741489,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.22,
+      "min": 3.657965,
+      "max": 3.757965,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.23,
+      "min": 3.671649,
+      "max": 3.771649,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.24,
+      "min": 3.697475,
+      "max": 3.797475,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.25,
+      "min": 3.709259,
+      "max": 3.809259,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.26,
+      "min": 3.733505,
+      "max": 3.833505,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.27,
+      "min": 3.748077,
+      "max": 3.848077,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.28,
+      "min": 3.758081,
+      "max": 3.858081,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.29,
+      "min": 3.771053,
+      "max": 3.871053,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.3,
+      "min": 3.79375,
+      "max": 3.89375,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.31,
+      "min": 3.815385,
+      "max": 3.915385,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.32,
+      "min": 3.816667,
+      "max": 3.916667,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.33,
+      "min": 3.863793,
+      "max": 3.963793,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.34,
+      "min": 3.865789,
+      "max": 3.965789,
+      "targetGrade": 4
+    },
+    {
+      "source": 2.35,
+      "min": 3.902381,
+      "max": 4.002381,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.36,
+      "min": 3.911905,
+      "max": 4.011905,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.37,
+      "min": 3.939474,
+      "max": 4.039474,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.38,
+      "min": 3.95,
+      "max": 4.05,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.39,
+      "min": 3.968519,
+      "max": 4.068519,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.4,
+      "min": 3.980612,
+      "max": 4.080612,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.41,
+      "min": 4,
+      "max": 4.1,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.42,
+      "min": 4.020707,
+      "max": 4.120707,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.43,
+      "min": 4.036538,
+      "max": 4.136538,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.44,
+      "min": 4.054167,
+      "max": 4.154167,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.45,
+      "min": 4.058911,
+      "max": 4.158911,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.46,
+      "min": 4.08,
+      "max": 4.18,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.47,
+      "min": 4.083333,
+      "max": 4.183333,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.48,
+      "min": 4.113043,
+      "max": 4.213043,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.49,
+      "min": 4.118224,
+      "max": 4.218224,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.5,
+      "min": 4.146262,
+      "max": 4.246262,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.51,
+      "min": 4.15202,
+      "max": 4.25202,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.52,
+      "min": 4.176415,
+      "max": 4.276415,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.53,
+      "min": 4.180769,
+      "max": 4.280769,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.54,
+      "min": 4.202525,
+      "max": 4.302525,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.55,
+      "min": 4.207426,
+      "max": 4.307426,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.56,
+      "min": 4.222727,
+      "max": 4.322727,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.57,
+      "min": 4.248969,
+      "max": 4.348969,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.58,
+      "min": 4.269588,
+      "max": 4.369588,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.59,
+      "min": 4.292857,
+      "max": 4.392857,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.6,
+      "min": 4.310825,
+      "max": 4.410825,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.61,
+      "min": 4.328947,
+      "max": 4.428947,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.62,
+      "min": 4.342157,
+      "max": 4.442157,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.63,
+      "min": 4.359524,
+      "max": 4.459524,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.64,
+      "min": 4.37,
+      "max": 4.47,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.65,
+      "min": 4.406522,
+      "max": 4.506522,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.66,
+      "min": 4.407447,
+      "max": 4.507447,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.67,
+      "min": 4.439362,
+      "max": 4.539362,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.68,
+      "min": 4.444949,
+      "max": 4.544949,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.69,
+      "min": 4.460638,
+      "max": 4.560638,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.7,
+      "min": 4.476882,
+      "max": 4.576882,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.71,
+      "min": 4.494554,
+      "max": 4.594554,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.72,
+      "min": 4.503191,
+      "max": 4.603191,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.73,
+      "min": 4.518807,
+      "max": 4.618807,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.74,
+      "min": 4.544059,
+      "max": 4.644059,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.75,
+      "min": 4.554396,
+      "max": 4.654396,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.76,
+      "min": 4.57069,
+      "max": 4.67069,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.77,
+      "min": 4.582075,
+      "max": 4.682075,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.78,
+      "min": 4.595161,
+      "max": 4.695161,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.79,
+      "min": 4.607407,
+      "max": 4.707407,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.8,
+      "min": 4.62619,
+      "max": 4.72619,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.81,
+      "min": 4.634211,
+      "max": 4.734211,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.82,
+      "min": 4.638889,
+      "max": 4.738889,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.83,
+      "min": 4.68,
+      "max": 4.78,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.84,
+      "min": 4.686842,
+      "max": 4.786842,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.85,
+      "min": 4.711468,
+      "max": 4.811468,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.86,
+      "min": 4.722277,
+      "max": 4.822277,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.87,
+      "min": 4.743103,
+      "max": 4.843103,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.88,
+      "min": 4.761881,
+      "max": 4.861881,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.89,
+      "min": 4.770755,
+      "max": 4.870755,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.9,
+      "min": 4.786735,
+      "max": 4.886735,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.91,
+      "min": 4.807143,
+      "max": 4.907143,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.92,
+      "min": 4.834615,
+      "max": 4.934615,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.93,
+      "min": 4.855263,
+      "max": 4.955263,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.94,
+      "min": 4.868367,
+      "max": 4.968367,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.95,
+      "min": 4.870792,
+      "max": 4.970792,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.96,
+      "min": 4.894444,
+      "max": 4.994444,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.97,
+      "min": 4.896237,
+      "max": 4.996237,
+      "targetGrade": 5
+    },
+    {
+      "source": 2.98,
+      "min": 4.921963,
+      "max": 5.021963,
+      "targetGrade": 6
+    },
+    {
+      "source": 2.99,
+      "min": 4.92561,
+      "max": 5.02561,
+      "targetGrade": 6
+    },
+    {
+      "source": 3,
+      "min": 4.979703,
+      "max": 5.079703,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.01,
+      "min": 4.979703,
+      "max": 5.079703,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.02,
+      "min": 5.002632,
+      "max": 5.102632,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.03,
+      "min": 5.003191,
+      "max": 5.103191,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.04,
+      "min": 5.032474,
+      "max": 5.132474,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.05,
+      "min": 5.034112,
+      "max": 5.134112,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.06,
+      "min": 5.052041,
+      "max": 5.152041,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.07,
+      "min": 5.072449,
+      "max": 5.172449,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.08,
+      "min": 5.097368,
+      "max": 5.197368,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.09,
+      "min": 5.121429,
+      "max": 5.221429,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.1,
+      "min": 5.134783,
+      "max": 5.234783,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.11,
+      "min": 5.145876,
+      "max": 5.245876,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.12,
+      "min": 5.161538,
+      "max": 5.261538,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.13,
+      "min": 5.185849,
+      "max": 5.285849,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.14,
+      "min": 5.197423,
+      "max": 5.297423,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.15,
+      "min": 5.22,
+      "max": 5.32,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.16,
+      "min": 5.22619,
+      "max": 5.32619,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.17,
+      "min": 5.268681,
+      "max": 5.368681,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.18,
+      "min": 5.276733,
+      "max": 5.376733,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.19,
+      "min": 5.289806,
+      "max": 5.389806,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.2,
+      "min": 5.302941,
+      "max": 5.402941,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.21,
+      "min": 5.314486,
+      "max": 5.414486,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.22,
+      "min": 5.330435,
+      "max": 5.430435,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.23,
+      "min": 5.344231,
+      "max": 5.444231,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.24,
+      "min": 5.368182,
+      "max": 5.468182,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.25,
+      "min": 5.39,
+      "max": 5.49,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.26,
+      "min": 5.413158,
+      "max": 5.513158,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.27,
+      "min": 5.427064,
+      "max": 5.527064,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.28,
+      "min": 5.440566,
+      "max": 5.540566,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.29,
+      "min": 5.460204,
+      "max": 5.560204,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.3,
+      "min": 5.47381,
+      "max": 5.57381,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.31,
+      "min": 5.486082,
+      "max": 5.586082,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.32,
+      "min": 5.491667,
+      "max": 5.591667,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.33,
+      "min": 5.530952,
+      "max": 5.630952,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.34,
+      "min": 5.53427,
+      "max": 5.63427,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.35,
+      "min": 5.567647,
+      "max": 5.667647,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.36,
+      "min": 5.572642,
+      "max": 5.672642,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.37,
+      "min": 5.592857,
+      "max": 5.692857,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.38,
+      "min": 5.604206,
+      "max": 5.704206,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.39,
+      "min": 5.616667,
+      "max": 5.716667,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.4,
+      "min": 5.630851,
+      "max": 5.730851,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.41,
+      "min": 5.647248,
+      "max": 5.747248,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.42,
+      "min": 5.664286,
+      "max": 5.764286,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.43,
+      "min": 5.683333,
+      "max": 5.783333,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.44,
+      "min": 5.702475,
+      "max": 5.802475,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.45,
+      "min": 5.707282,
+      "max": 5.807282,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.46,
+      "min": 5.724194,
+      "max": 5.824194,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.47,
+      "min": 5.729412,
+      "max": 5.829412,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.48,
+      "min": 5.763725,
+      "max": 5.863725,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.49,
+      "min": 5.765534,
+      "max": 5.865534,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.5,
+      "min": 5.807143,
+      "max": 5.907143,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.51,
+      "min": 5.811386,
+      "max": 5.911386,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.52,
+      "min": 5.835714,
+      "max": 5.935714,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.53,
+      "min": 5.841892,
+      "max": 5.941892,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.54,
+      "min": 5.85625,
+      "max": 5.95625,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.55,
+      "min": 5.86,
+      "max": 5.96,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.56,
+      "min": 5.87381,
+      "max": 5.97381,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.57,
+      "min": 5.88617,
+      "max": 5.98617,
+      "targetGrade": 6
+    },
+    {
+      "source": 3.58,
+      "min": 5.904128,
+      "max": 6.004128,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.59,
+      "min": 5.929381,
+      "max": 6.029381,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.6,
+      "min": 5.940099,
+      "max": 6.040099,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.61,
+      "min": 5.95,
+      "max": 6.05,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.62,
+      "min": 5.967544,
+      "max": 6.067544,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.63,
+      "min": 5.98125,
+      "max": 6.08125,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.64,
+      "min": 5.990816,
+      "max": 6.090816,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.65,
+      "min": 6.021429,
+      "max": 6.121429,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.66,
+      "min": 6.025472,
+      "max": 6.125472,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.67,
+      "min": 6.063402,
+      "max": 6.163402,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.68,
+      "min": 6.067647,
+      "max": 6.167647,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.69,
+      "min": 6.078713,
+      "max": 6.178713,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.7,
+      "min": 6.095833,
+      "max": 6.195833,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.71,
+      "min": 6.112393,
+      "max": 6.212393,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.72,
+      "min": 6.128218,
+      "max": 6.228218,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.73,
+      "min": 6.151835,
+      "max": 6.251835,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.74,
+      "min": 6.171053,
+      "max": 6.271053,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.75,
+      "min": 6.187113,
+      "max": 6.287113,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.76,
+      "min": 6.210417,
+      "max": 6.310417,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.77,
+      "min": 6.218041,
+      "max": 6.318041,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.78,
+      "min": 6.235714,
+      "max": 6.335714,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.79,
+      "min": 6.24703,
+      "max": 6.34703,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.8,
+      "min": 6.264286,
+      "max": 6.364286,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.81,
+      "min": 6.276316,
+      "max": 6.376316,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.82,
+      "min": 6.280357,
+      "max": 6.380357,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.83,
+      "min": 6.321134,
+      "max": 6.421134,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.84,
+      "min": 6.328641,
+      "max": 6.428641,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.85,
+      "min": 6.355941,
+      "max": 6.455941,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.86,
+      "min": 6.364141,
+      "max": 6.464141,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.87,
+      "min": 6.385644,
+      "max": 6.485644,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.88,
+      "min": 6.411538,
+      "max": 6.511538,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.89,
+      "min": 6.42619,
+      "max": 6.52619,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.9,
+      "min": 6.439583,
+      "max": 6.539583,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.91,
+      "min": 6.460417,
+      "max": 6.560417,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.92,
+      "min": 6.483333,
+      "max": 6.583333,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.93,
+      "min": 6.502083,
+      "max": 6.602083,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.94,
+      "min": 6.516038,
+      "max": 6.616038,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.95,
+      "min": 6.518627,
+      "max": 6.618627,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.96,
+      "min": 6.537156,
+      "max": 6.637156,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.97,
+      "min": 6.537156,
+      "max": 6.637156,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.98,
+      "min": 6.559524,
+      "max": 6.659524,
+      "targetGrade": 7
+    },
+    {
+      "source": 3.99,
+      "min": 6.56,
+      "max": 6.66,
+      "targetGrade": 7
+    },
+    {
+      "source": 4,
+      "min": 6.620103,
+      "max": 6.720103,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.01,
+      "min": 6.620103,
+      "max": 6.720103,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.02,
+      "min": 6.65297,
+      "max": 6.75297,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.03,
+      "min": 6.655882,
+      "max": 6.755882,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.04,
+      "min": 6.675664,
+      "max": 6.775664,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.05,
+      "min": 6.678155,
+      "max": 6.778155,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.06,
+      "min": 6.695283,
+      "max": 6.795283,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.07,
+      "min": 6.723196,
+      "max": 6.823196,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.08,
+      "min": 6.745699,
+      "max": 6.845699,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.09,
+      "min": 6.773529,
+      "max": 6.873529,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.1,
+      "min": 6.790909,
+      "max": 6.890909,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.11,
+      "min": 6.799057,
+      "max": 6.899057,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.12,
+      "min": 6.818687,
+      "max": 6.918687,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.13,
+      "min": 6.838889,
+      "max": 6.938889,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.14,
+      "min": 6.853846,
+      "max": 6.953846,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.15,
+      "min": 6.876316,
+      "max": 6.976316,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.16,
+      "min": 6.881373,
+      "max": 6.981373,
+      "targetGrade": 7
+    },
+    {
+      "source": 4.17,
+      "min": 6.93,
+      "max": 7.03,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.18,
+      "min": 6.940566,
+      "max": 7.040566,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.19,
+      "min": 6.95,
+      "max": 7.05,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.2,
+      "min": 6.968349,
+      "max": 7.068349,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.21,
+      "min": 6.979703,
+      "max": 7.079703,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.22,
+      "min": 6.987736,
+      "max": 7.087736,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.23,
+      "min": 6.998077,
+      "max": 7.098077,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.24,
+      "min": 7.011224,
+      "max": 7.111224,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.25,
+      "min": 7.025269,
+      "max": 7.125269,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.26,
+      "min": 7.042784,
+      "max": 7.142784,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.27,
+      "min": 7.054762,
+      "max": 7.154762,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.28,
+      "min": 7.068812,
+      "max": 7.168812,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.29,
+      "min": 7.08,
+      "max": 7.18,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.3,
+      "min": 7.092857,
+      "max": 7.192857,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.31,
+      "min": 7.11129,
+      "max": 7.21129,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.32,
+      "min": 7.115049,
+      "max": 7.215049,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.33,
+      "min": 7.155607,
+      "max": 7.255607,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.34,
+      "min": 7.159524,
+      "max": 7.259524,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.35,
+      "min": 7.197706,
+      "max": 7.297706,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.36,
+      "min": 7.205319,
+      "max": 7.305319,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.37,
+      "min": 7.218041,
+      "max": 7.318041,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.38,
+      "min": 7.23125,
+      "max": 7.33125,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.39,
+      "min": 7.250971,
+      "max": 7.350971,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.4,
+      "min": 7.260345,
+      "max": 7.360345,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.41,
+      "min": 7.286634,
+      "max": 7.386634,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.42,
+      "min": 7.306436,
+      "max": 7.406436,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.43,
+      "min": 7.32037,
+      "max": 7.42037,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.44,
+      "min": 7.335417,
+      "max": 7.435417,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.45,
+      "min": 7.342157,
+      "max": 7.442157,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.46,
+      "min": 7.35708,
+      "max": 7.45708,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.47,
+      "min": 7.362371,
+      "max": 7.462371,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.48,
+      "min": 7.378571,
+      "max": 7.478571,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.49,
+      "min": 7.38299,
+      "max": 7.48299,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.5,
+      "min": 7.427273,
+      "max": 7.527273,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.51,
+      "min": 7.435149,
+      "max": 7.535149,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.52,
+      "min": 7.456667,
+      "max": 7.556667,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.53,
+      "min": 7.46,
+      "max": 7.56,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.54,
+      "min": 7.468072,
+      "max": 7.568072,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.55,
+      "min": 7.476786,
+      "max": 7.576786,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.56,
+      "min": 7.496296,
+      "max": 7.596296,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.57,
+      "min": 7.51,
+      "max": 7.61,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.58,
+      "min": 7.525472,
+      "max": 7.625472,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.59,
+      "min": 7.539474,
+      "max": 7.639474,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.6,
+      "min": 7.553774,
+      "max": 7.653774,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.61,
+      "min": 7.559756,
+      "max": 7.659756,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.62,
+      "min": 7.583663,
+      "max": 7.683663,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.63,
+      "min": 7.605914,
+      "max": 7.705914,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.64,
+      "min": 7.616667,
+      "max": 7.716667,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.65,
+      "min": 7.65297,
+      "max": 7.75297,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.66,
+      "min": 7.654762,
+      "max": 7.754762,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.67,
+      "min": 7.697368,
+      "max": 7.797368,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.68,
+      "min": 7.721429,
+      "max": 7.821429,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.69,
+      "min": 7.728947,
+      "max": 7.828947,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.7,
+      "min": 7.733019,
+      "max": 7.833019,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.71,
+      "min": 7.745918,
+      "max": 7.845918,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.72,
+      "min": 7.757339,
+      "max": 7.857339,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.73,
+      "min": 7.765534,
+      "max": 7.865534,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.74,
+      "min": 7.788384,
+      "max": 7.888384,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.75,
+      "min": 7.793137,
+      "max": 7.893137,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.76,
+      "min": 7.812385,
+      "max": 7.912385,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.77,
+      "min": 7.820968,
+      "max": 7.920968,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.78,
+      "min": 7.834615,
+      "max": 7.934615,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.79,
+      "min": 7.847959,
+      "max": 7.947959,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.8,
+      "min": 7.869192,
+      "max": 7.969192,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.81,
+      "min": 7.881818,
+      "max": 7.981818,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.82,
+      "min": 7.882692,
+      "max": 7.982692,
+      "targetGrade": 8
+    },
+    {
+      "source": 4.83,
+      "min": 7.95,
+      "max": 8.05,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.84,
+      "min": 7.95,
+      "max": 8.05,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.85,
+      "min": 7.99717,
+      "max": 8.09717,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.86,
+      "min": 8.017308,
+      "max": 8.117308,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.87,
+      "min": 8.05,
+      "max": 8.15,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.88,
+      "min": 8.069266,
+      "max": 8.169266,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.89,
+      "min": 8.075,
+      "max": 8.175,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.9,
+      "min": 8.083333,
+      "max": 8.183333,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.91,
+      "min": 8.105172,
+      "max": 8.205172,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.92,
+      "min": 8.167822,
+      "max": 8.267822,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.93,
+      "min": 8.188095,
+      "max": 8.288095,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.94,
+      "min": 8.23866,
+      "max": 8.33866,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.95,
+      "min": 8.280097,
+      "max": 8.380097,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.96,
+      "min": 8.392308,
+      "max": 8.492308,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.97,
+      "min": 8.514356,
+      "max": 8.614356,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.98,
+      "min": 8.633168,
+      "max": 8.733168,
+      "targetGrade": 9
+    },
+    {
+      "source": 4.99,
+      "min": 8.79,
+      "max": 8.89,
+      "targetGrade": 9
+    },
+    {
+      "source": 5,
+      "min": 9,
+      "max": 9,
+      "targetGrade": 9
+    }
+  ]
+}

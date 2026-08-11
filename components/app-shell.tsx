@@ -2,6 +2,8 @@
 
 import {
   BookOpen,
+  BookOpenCheck,
+  Calculator,
   CalendarDays,
   ChevronDown,
   ChevronRight,
@@ -11,8 +13,10 @@ import {
   GraduationCap,
   Home,
   Menu,
+  MapPinned,
   Newspaper,
   Search,
+  Route,
   Table2,
   Utensils,
   X,
@@ -46,6 +50,26 @@ const careerItems: NavItem[] = [
     href: "/career/2028/recommended-subjects",
     label: "핵심·권장과목",
     icon: FileSpreadsheet,
+  },
+  {
+    href: "/career/2028/subjects-to-majors",
+    label: "과목에서 학과 찾기",
+    icon: BookOpenCheck,
+  },
+  {
+    href: "/career/2028/university-map",
+    label: "대학 지도",
+    icon: MapPinned,
+  },
+  {
+    href: "/career/2028/pathways",
+    label: "진로 노선도",
+    icon: Route,
+  },
+  {
+    href: "/career/2028/grade-converter",
+    label: "5→9등급 예상 범위",
+    icon: Calculator,
   },
 ];
 

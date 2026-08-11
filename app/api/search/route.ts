@@ -19,6 +19,49 @@ export type SearchResult = {
 const includes = (values: unknown[], query: string) =>
   values.join(" ").toLocaleLowerCase("ko").includes(query);
 
+const featurePages: Array<SearchResult & { keywords: string }> = [
+  {
+    id: "feature-subjects-to-majors",
+    type: "진로 탐색",
+    title: "과목에서 학과 찾기",
+    description: "관심 과목과 연결되는 대학·학과를 찾습니다.",
+    href: "/career/2028/subjects-to-majors",
+    keywords: "과목 학과 전공 선택과목 핵심과목 권장과목",
+  },
+  {
+    id: "feature-university-map",
+    type: "진로 탐색",
+    title: "대학 지도",
+    description: "대학을 권역과 지역별로 둘러봅니다.",
+    href: "/career/2028/university-map",
+    keywords: "대학 지도 지역 권역 서울 부산 수도권 영남권 중부권 호남권",
+  },
+  {
+    id: "feature-pathways",
+    type: "진로 탐색",
+    title: "진로 노선도",
+    description: "관심 분야에서 과목과 대표 학과까지 연결해 봅니다.",
+    href: "/career/2028/pathways",
+    keywords: "진로 노선 계열 전공 공학 인문 사회 자연 의약 보건 교육 예체능",
+  },
+  {
+    id: "feature-grade-converter",
+    type: "진학 도구",
+    title: "5등급제 → 9등급제 예상 범위",
+    description: "부산교육청 401개 기준값으로 예상 범위를 확인합니다.",
+    href: "/career/2028/grade-converter",
+    keywords: "등급 변환 환산 5등급 9등급 내신",
+  },
+  {
+    id: "feature-monthly-calendar",
+    type: "학사일정",
+    title: "월간 학사 달력",
+    description: "학사일정을 월간 달력으로 확인합니다.",
+    href: "/school/calendar",
+    keywords: "월간 달력 캘린더 학사일정 일정",
+  },
+];
+
 export async function GET(request: NextRequest) {
   const query = (request.nextUrl.searchParams.get("q") || "")
     .trim()
@@ -32,6 +75,18 @@ export async function GET(request: NextRequest) {
   const add = (result: SearchResult) => {
     if (results.length < 80) results.push(result);
   };
+
+  featurePages
+    .filter((page) => includes([page.title, page.description, page.keywords], query))
+    .forEach((page) =>
+      add({
+        id: page.id,
+        type: page.type,
+        title: page.title,
+        description: page.description,
+        href: page.href,
+      }),
+    );
 
   academicCalendarEvents
     .filter((event) => includes([event.title], query))

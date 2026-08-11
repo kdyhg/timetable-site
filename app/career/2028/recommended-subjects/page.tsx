@@ -11,7 +11,8 @@ import {
   SlidersHorizontal,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useMemo, useState } from "react";
 
 type Recommendation = (typeof recommendationData.records)[number];
 
@@ -157,8 +158,9 @@ function FilterControls({
   );
 }
 
-export default function RecommendedSubjectsPage() {
-  const [query, setQuery] = useState("");
+function RecommendedSubjectsContent() {
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get("q") ?? "");
   const [area, setArea] = useState("all");
   const [region, setRegion] = useState("all");
   const [university, setUniversity] = useState("all");
@@ -452,5 +454,19 @@ export default function RecommendedSubjectsPage() {
         </div>
       )}
     </>
+  );
+}
+
+export default function RecommendedSubjectsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="notion-card p-5 text-sm text-[#787774]">
+          핵심·권장과목 자료를 준비하고 있습니다.
+        </div>
+      }
+    >
+      <RecommendedSubjectsContent />
+    </Suspense>
   );
 }
