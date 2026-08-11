@@ -19,14 +19,14 @@ export const periodTimes = [
 ] as const;
 
 export const classTimetable: ClassTimetable = [
-  ["대수", "일본어", "A", "진로독서", "진로", "영어", "B"],
-  ["미술", "미술", "대수", "정보", "C", "스포츠", "문학"],
-  ["영어", "정보", "A", "문학", "HR", "HR", ""],
-  ["C", "B", "영어", "문학", "대수", "일본어", "A"],
-  ["문학", "대수", "B", "일본어", "정보", "C", "영어"],
+  ["화법", "미적", "가정", "일본어", "영어", "B", "A"],
+  ["영어", "화법", "C", "진독", "미적", "A", "B"],
+  ["기술", "진로", "영어", "C", "HR", "HR", ""],
+  ["A", "일본어", "화법", "미적", "기술", "음악", "B"],
+  ["화법", "체육", "C", "미적", "일본어", "영어", "음악"],
 ];
 
 export const validStudentIds = Array.from(
   { length: 24 },
   (_, index) => `210${String(index + 1).padStart(2, "0")}`,
-);
+).filter((studentId) => studentId !== "21006");
