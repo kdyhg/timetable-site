@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/page-header";
+import { RandomMajorExplorer } from "@/components/random-major-explorer";
 import { BookOpen, ChevronRight, FileSpreadsheet, ListChecks } from "lucide-react";
 import Link from "next/link";
 
@@ -47,6 +48,7 @@ export default function CareerIndexPage() {
           );
         })}
       </div>
+      <RandomMajorExplorer />
     </>
   );
 }

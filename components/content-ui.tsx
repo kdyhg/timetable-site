@@ -1,4 +1,4 @@
-import type { ClassItem, Notice, NoticeImagePosition } from "@/lib/content";
+import type { Notice, NoticeImagePosition } from "@/lib/content";
 import { formatDateString } from "@/lib/school";
 import { Download, ExternalLink, Image as ImageIcon } from "lucide-react";
 
@@ -148,25 +148,6 @@ export function ResourceLinks({
         </a>
       )}
     </div>
-  );
-}
-
-export function ClassItemCard({ item }: { item: ClassItem }) {
-  return (
-    <article className="notion-card p-4 sm:p-5">
-      <div className="flex flex-wrap items-center gap-2">
-        <CategoryBadge label={item.item_type} />
-        {item.subject && <span className="text-xs font-medium text-[#787774]">{item.subject}</span>}
-      </div>
-      <h3 className="mt-3 font-semibold">{item.title}</h3>
-      <p className="mt-1 text-sm text-[#0075de]">{formatDateString(item.date, item.end_date)}</p>
-      <dl className="mt-4 space-y-3 text-sm">
-        {item.scope && <div><dt className="text-xs font-semibold text-[#787774]">범위</dt><dd className="mt-1 whitespace-pre-wrap leading-6">{item.scope}</dd></div>}
-        {item.preparation && <div><dt className="text-xs font-semibold text-[#787774]">준비사항</dt><dd className="mt-1 whitespace-pre-wrap leading-6">{item.preparation}</dd></div>}
-        {item.details && <div><dt className="text-xs font-semibold text-[#787774]">안내</dt><dd className="mt-1 whitespace-pre-wrap leading-6">{item.details}</dd></div>}
-      </dl>
-      <ResourceLinks linkUrl={item.link_url} attachmentUrl={item.attachment_url} attachmentName={item.attachment_name} />
-    </article>
   );
 }
 

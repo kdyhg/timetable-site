@@ -12,16 +12,12 @@ import { EmptyState, SectionTitle } from "@/components/ui";
 import { parseApiResponse } from "@/lib/client-api";
 import {
   isVisibleNotice,
-  type ClassItem,
   type Notice,
-  type RoadmapItem,
 } from "@/lib/content";
 import {
-  addDays,
   fetchMeals,
   formatMealAllergenWarning,
   formatAcademicDate,
-  formatDateString,
   getLocalDateString,
   isDateInRange,
   type Meal,
@@ -32,8 +28,6 @@ import { getExamFocus } from "@/lib/student-tools";
 import {
   CalendarDays,
   ChevronRight,
-  ClipboardCheck,
-  Map,
   Utensils,
 } from "lucide-react";
 import Link from "next/link";
@@ -44,10 +38,7 @@ export default function HomePage() {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [mealStatus, setMealStatus] = useState("급식 정보를 불러오는 중입니다.");
   const [notices, setNotices] = useState<Notice[]>([]);
-  const [items, setItems] = useState<ClassItem[]>([]);
-  const [roadmaps, setRoadmaps] = useState<RoadmapItem[]>([]);
   const todayDate = useMemo(() => parseLocalDate(today), [today]);
-  const nextWeek = useMemo(() => addDays(todayDate, 7), [todayDate]);
   const examFocus = getExamFocus(academicCalendarEvents);
   const academicToday = academicCalendarEvents.filter((event) =>
     isDateInRange(event.date, todayDate, todayDate, event.endDate),
@@ -58,10 +49,6 @@ export default function HomePage() {
   const important = notices.filter(
     (notice) => notice.is_important && isVisibleNotice(notice, today),
   );
-  const upcomingItems = items.filter((item) =>
-    isDateInRange(item.date, todayDate, nextWeek, item.end_date),
-  );
-  const monthRoadmap = roadmaps.find((item) => item.month === today.slice(0, 7));
 
   useEffect(() => {
     fetchMeals(today)
@@ -73,17 +60,9 @@ export default function HomePage() {
         setMeals([]);
         setMealStatus("급식 정보를 불러오지 못했습니다.");
       });
-    Promise.allSettled([
-      parseApiResponse<Notice[]>(fetch("/api/notices", { cache: "no-store" })),
-      parseApiResponse<ClassItem[]>(fetch("/api/class-items", { cache: "no-store" })),
-      parseApiResponse<RoadmapItem[]>(
-        fetch("/api/roadmap-items", { cache: "no-store" }),
-      ),
-    ]).then(([noticeResult, itemResult, roadmapResult]) => {
-      if (noticeResult.status === "fulfilled") setNotices(noticeResult.value);
-      if (itemResult.status === "fulfilled") setItems(itemResult.value);
-      if (roadmapResult.status === "fulfilled") setRoadmaps(roadmapResult.value);
-    });
+    parseApiResponse<Notice[]>(fetch("/api/notices", { cache: "no-store" }))
+      .then(setNotices)
+      .catch(() => setNotices([]));
   }, [today]);
 
   return (
@@ -104,40 +83,10 @@ export default function HomePage() {
         </p>
       </header>
 
-      {examFocus && <ExamFocusCard focus={examFocus} items={items} />}
+      {examFocus && <ExamFocusCard focus={examFocus} />}
 
-      <div className="mb-8 grid gap-5 md:grid-cols-2">
+      <div className="mb-8">
         <CurrentPeriodCard />
-        <section className="notion-card overflow-hidden">
-          <div className="flex items-center justify-between gap-3 border-b border-[#e6e6e6] px-4 py-3">
-            <p className="flex items-center gap-2 text-sm font-semibold">
-              <Map className="h-4 w-4 text-[#0075de]" /> 이번 달 로드맵
-            </p>
-            <Link href="/school/roadmap" className="text-xs font-semibold text-[#0075de]">
-              전체 보기
-            </Link>
-          </div>
-          {monthRoadmap ? (
-            <div className="p-5">
-              <h2 className="text-lg font-bold">{monthRoadmap.title}</h2>
-              <p className="mt-2 line-clamp-3 text-sm leading-6 text-[#615d59]">
-                {monthRoadmap.description}
-              </p>
-              {monthRoadmap.action_points.length > 0 && (
-                <p className="mt-4 rounded-md bg-[#f6f5f4] p-3 text-sm">
-                  먼저 할 일 · {monthRoadmap.action_points[0]}
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="p-5">
-              <p className="text-sm leading-6 text-[#787774]">
-                이번 달 행동 가이드는 아직 등록되지 않았습니다. 학교 일정은 계속
-                확인할 수 있습니다.
-              </p>
-            </div>
-          )}
-        </section>
       </div>
 
       {important.length > 0 && (
@@ -168,8 +117,7 @@ export default function HomePage() {
         <div className="space-y-8">
           <section>
             <SectionTitle title="오늘 일정" />
-            {academicToday.length ||
-            upcomingItems.filter((item) => item.date === today).length ? (
+            {academicToday.length ? (
               <div className="notion-card divide-y divide-[#e6e6e6]">
                 {academicToday.map((event) => (
                   <Link
@@ -184,24 +132,6 @@ export default function HomePage() {
                     </div>
                   </Link>
                 ))}
-                {upcomingItems
-                  .filter((item) => item.date === today)
-                  .map((item) => (
-                    <Link
-                      href="/school/assessments"
-                      key={item.id}
-                      className="flex gap-3 p-4 hover:bg-[#fbfbfa]"
-                    >
-                      <ClipboardCheck className="mt-0.5 h-4 w-4 text-[#0075de]" />
-                      <div>
-                        <p className="text-xs text-[#787774]">
-                          {item.item_type}
-                          {item.subject ? ` · ${item.subject}` : ""}
-                        </p>
-                        <p className="mt-1 text-sm font-medium">{item.title}</p>
-                      </div>
-                    </Link>
-                  ))}
               </div>
             ) : (
               <EmptyState title="오늘 등록된 일정이 없습니다." />
@@ -212,31 +142,13 @@ export default function HomePage() {
             <SectionTitle
               title="앞으로 7일"
               action={
-                <Link href="/school/weekly" className="text-sm font-medium text-[#0075de]">
-                  주간 브리핑
+                <Link href="/school/calendar" className="text-sm font-medium text-[#0075de]">
+                  전체 일정
                 </Link>
               }
             />
-            {academicUpcoming.length || upcomingItems.length ? (
+            {academicUpcoming.length ? (
               <div className="notion-card divide-y divide-[#e6e6e6]">
-                {upcomingItems.slice(0, 6).map((item) => (
-                  <Link
-                    href="/school/assessments"
-                    key={`item-${item.id}`}
-                    className="flex items-center justify-between gap-4 p-4 hover:bg-[#fbfbfa]"
-                  >
-                    <div>
-                      <p className="text-xs text-[#787774]">
-                        {item.item_type}
-                        {item.subject ? ` · ${item.subject}` : ""}
-                      </p>
-                      <p className="mt-1 text-sm font-medium">{item.title}</p>
-                    </div>
-                    <span className="shrink-0 text-xs text-[#0075de]">
-                      {formatDateString(item.date)}
-                    </span>
-                  </Link>
-                ))}
                 {academicUpcoming.slice(0, 5).map((event) => (
                   <Link
                     href="/school/calendar"

@@ -155,10 +155,3 @@ export function getExamFocus(
 
   return { title: active.title, start, end, daysUntil };
 }
-
-export const getDaysUntil = (dateString: string, now = new Date()) =>
-  Math.ceil(
-    (parseLocalDate(dateString).getTime() -
-      parseLocalDate(getLocalDateString(now)).getTime()) /
-      86_400_000,
-  );

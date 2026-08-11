@@ -3,7 +3,7 @@
 import { CategoryBadge } from "@/components/content-ui";
 import { PageHeader } from "@/components/page-header";
 import { parseApiResponse } from "@/lib/client-api";
-import type { ClassItem, Notice, RoadmapItem } from "@/lib/content";
+import type { Notice } from "@/lib/content";
 import { clearAdminPassword, getAdminPassword, setAdminPassword } from "@/lib/notices";
 import {
   AlertTriangle,
@@ -35,23 +35,19 @@ export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [error, setError] = useState("");
   const [notices, setNotices] = useState<Notice[]>([]);
-  const [items, setItems] = useState<ClassItem[]>([]);
-  const [roadmaps, setRoadmaps] = useState<RoadmapItem[]>([]);
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
   const [checkingStatus, setCheckingStatus] = useState(false);
 
   const load = useCallback(async () => {
     setError("");
-    const [noticeResult, itemResult, roadmapResult] = await Promise.allSettled([
-        parseApiResponse<Notice[]>(fetch("/api/notices", { cache: "no-store" })),
-        parseApiResponse<ClassItem[]>(fetch("/api/class-items", { cache: "no-store" })),
-        parseApiResponse<RoadmapItem[]>(fetch("/api/roadmap-items", { cache: "no-store" })),
-      ]);
-    if (noticeResult.status === "fulfilled") setNotices(noticeResult.value);
-    if (itemResult.status === "fulfilled") setItems(itemResult.value);
-    if (roadmapResult.status === "fulfilled") setRoadmaps(roadmapResult.value);
-    if ([noticeResult, itemResult, roadmapResult].some((result) => result.status === "rejected")) {
-      setError("일부 관리 데이터를 불러오지 못했습니다. 아래 서비스 상태를 확인하세요.");
+    try {
+      setNotices(
+        await parseApiResponse<Notice[]>(
+          fetch("/api/notices", { cache: "no-store" }),
+        ),
+      );
+    } catch {
+      setError("공지사항을 불러오지 못했습니다. 아래 서비스 상태를 확인하세요.");
     }
   }, []);
 
@@ -98,14 +94,8 @@ export default function AdminPage() {
     <div className="mx-auto max-w-md notion-card space-y-3 p-5 sm:p-6"><input type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="notion-input w-full" placeholder="관리자 비밀번호" />{error && <p className="text-sm text-red-600">{error}</p>}<button type="button" onClick={() => { if (password === PASSWORD) { setAdminPassword(password); setAuthenticated(true); setError(""); load(); window.setTimeout(checkSystem, 0); } else setError("비밀번호가 올바르지 않습니다."); }} className="notion-button notion-button-primary w-full"><LogIn className="h-4 w-4" /> 로그인</button></div>
   </>;
 
-  const sections = [
-    { title: "공지사항", rows: notices, newHref: "/admin/notices/new", api: "/api/notices", edit: (id: number) => `/admin/notices/new?id=${id}`, label: (row: Notice) => row.title, badge: (row: Notice) => row.category },
-    { title: "평가·제출·준비물", rows: items, newHref: "/admin/class-items/new", api: "/api/class-items", edit: (id: number) => `/admin/class-items/new?id=${id}`, label: (row: ClassItem) => `${row.date} · ${row.title}`, badge: (row: ClassItem) => row.item_type },
-    { title: "고2 월별 로드맵", rows: roadmaps, newHref: "/admin/roadmap-items/new", api: "/api/roadmap-items", edit: (id: number) => `/admin/roadmap-items/new?id=${id}`, label: (row: RoadmapItem) => `${row.month} · ${row.title}`, badge: (row: RoadmapItem) => `${Number(row.month.slice(5))}월` },
-  ];
-
   return <>
-    <PageHeader title="콘텐츠 관리" description="학생 화면에 표시할 공지, 일정과 월별 로드맵을 관리합니다." crumbs={[{ label: "홈", href: "/" }, { label: "관리자" }]} actions={<button type="button" onClick={() => { clearAdminPassword(); setAuthenticated(false); }} className="notion-button"><LogOut className="h-4 w-4" /> 로그아웃</button>} />
+    <PageHeader title="공지 관리" description="학생 화면에 표시할 공지와 첨부파일을 관리합니다." crumbs={[{ label: "홈", href: "/" }, { label: "관리자" }]} actions={<button type="button" onClick={() => { clearAdminPassword(); setAuthenticated(false); }} className="notion-button"><LogOut className="h-4 w-4" /> 로그아웃</button>} />
     {error && <p className="mb-5 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>}
     <section className="mb-8">
       <div className="mb-3 flex items-center justify-between gap-3">
@@ -135,7 +125,7 @@ export default function AdminPage() {
             처음 설정하는 순서
           </summary>
           <ol className="list-decimal space-y-2 border-t border-[#e6e6e6] px-8 py-4 text-sm leading-6 text-[#615d59]">
-            <li>Supabase SQL Editor에서 <b>20260610_public_class_hub.sql</b>과 <b>20260611_student_tools.sql</b>을 실행합니다.</li>
+            <li>Supabase SQL Editor에서 <b>20260610_public_class_hub.sql</b>과 <b>20260706_notice_image_position.sql</b>을 실행합니다.</li>
             <li>Vercel Production 환경에 Supabase 서버 비밀 키와 관리자 비밀번호를 설정합니다.</li>
             <li>Vercel에서 최신 Production 배포를 다시 배포합니다.</li>
             <li>배포 후 이 화면에서 <b>다시 확인</b>을 누릅니다.</li>
@@ -143,6 +133,25 @@ export default function AdminPage() {
         </details>
       )}
     </section>
-    <div className="space-y-8">{sections.map((section) => <section key={section.title}><div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">{section.title}</h2><Link href={section.newHref} className="notion-button notion-button-primary shrink-0"><Plus className="h-4 w-4" /> 새 항목</Link></div><div className="notion-card divide-y divide-[#e6e6e6]">{section.rows.length ? section.rows.slice(0, 20).map((row) => <div key={row.id} className="flex items-center justify-between gap-4 p-4"><div className="min-w-0"><CategoryBadge label={section.badge(row as never)} /><p className="mt-2 truncate text-sm font-medium">{section.label(row as never)}</p></div><div className="flex shrink-0 gap-1"><Link href={section.edit(row.id)} className="touch-icon-button" title="수정"><Edit3 className="h-4 w-4" /></Link><button type="button" onClick={() => remove(section.api, row.id)} className="touch-icon-button hover:bg-red-50 hover:text-red-600" title="삭제"><Trash2 className="h-4 w-4" /></button></div></div>) : <p className="p-6 text-center text-sm text-[#787774]">등록된 항목이 없습니다.</p>}</div></section>)}</div>
+    <section>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold">공지사항</h2>
+        <Link href="/admin/notices/new" className="notion-button notion-button-primary shrink-0"><Plus className="h-4 w-4" /> 새 공지</Link>
+      </div>
+      <div className="notion-card divide-y divide-[#e6e6e6]">
+        {notices.length ? notices.slice(0, 30).map((notice) => (
+          <div key={notice.id} className="flex items-center justify-between gap-4 p-4">
+            <div className="min-w-0">
+              <CategoryBadge label={notice.category} />
+              <p className="mt-2 truncate text-sm font-medium">{notice.title}</p>
+            </div>
+            <div className="flex shrink-0 gap-1">
+              <Link href={`/admin/notices/new?id=${notice.id}`} className="touch-icon-button" title="수정"><Edit3 className="h-4 w-4" /></Link>
+              <button type="button" onClick={() => remove("/api/notices", notice.id)} className="touch-icon-button hover:bg-red-50 hover:text-red-600" title="삭제"><Trash2 className="h-4 w-4" /></button>
+            </div>
+          </div>
+        )) : <p className="p-6 text-center text-sm text-[#787774]">등록된 공지가 없습니다.</p>}
+      </div>
+    </section>
   </>;
 }

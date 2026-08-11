@@ -2,14 +2,28 @@
 
 import { academicCalendarEvents, type AcademicSemester } from "@/app/academic-calendar-data";
 import { PageHeader } from "@/components/page-header";
-import { formatAcademicDate, parseLocalDate, upcomingEvents } from "@/lib/school";
+import {
+  formatAcademicDate,
+  getLocalDateString,
+  parseLocalDate,
+  upcomingEvents,
+} from "@/lib/school";
 import { CalendarDays } from "lucide-react";
 import { useMemo, useState } from "react";
 
 type Filter = "all" | AcademicSemester;
 
+const getInitialFilter = (): Filter => {
+  const today = getLocalDateString();
+  return (
+    academicCalendarEvents.find(
+      (event) => (event.endDate ?? event.date) >= today,
+    )?.semester ?? "all"
+  );
+};
+
 export default function CalendarPage() {
-  const [filter, setFilter] = useState<Filter>("all");
+  const [filter, setFilter] = useState<Filter>(getInitialFilter);
   const upcoming = useMemo(() => upcomingEvents(academicCalendarEvents), []);
   const groups = useMemo(() => {
     const filtered = academicCalendarEvents.filter((event) => filter === "all" || event.semester === filter);

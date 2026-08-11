@@ -102,11 +102,7 @@ export async function GET(request: NextRequest) {
 
   const supabase = getPublicSupabase();
   if (supabase) {
-    const [notices, items, roadmaps] = await Promise.all([
-      supabase.from("notices").select("*").limit(100),
-      supabase.from("class_items").select("*").limit(100),
-      supabase.from("roadmap_items").select("*").limit(100),
-    ]);
+    const notices = await supabase.from("notices").select("*").limit(100);
     (notices.data ?? [])
       .filter(
         (row) =>
@@ -122,34 +118,6 @@ export async function GET(request: NextRequest) {
           title: row.title,
           description: row.content,
           href: "/school/notices",
-        }),
-      );
-    (items.data ?? [])
-      .filter((row) =>
-        includes([row.title, row.subject, row.scope, row.preparation, row.details], query),
-      )
-      .slice(0, 12)
-      .forEach((row) =>
-        add({
-          id: `item-${row.id}`,
-          type: row.item_type,
-          title: row.title,
-          description: [row.date, row.subject, row.scope].filter(Boolean).join(" · "),
-          href: "/school/assessments",
-        }),
-      );
-    (roadmaps.data ?? [])
-      .filter((row) =>
-        includes([row.month, row.title, row.description, ...(row.action_points ?? [])], query),
-      )
-      .slice(0, 12)
-      .forEach((row) =>
-        add({
-          id: `roadmap-${row.id}`,
-          type: "월별 로드맵",
-          title: row.title,
-          description: `${row.month} · ${row.description}`,
-          href: "/school/roadmap",
         }),
       );
   }
