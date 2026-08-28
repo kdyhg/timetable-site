@@ -8,9 +8,11 @@ import { clearAdminPassword, getAdminPassword, setAdminPassword } from "@/lib/no
 import {
   AlertTriangle,
   CheckCircle2,
+  ChevronRight,
   Edit3,
   LogIn,
   LogOut,
+  MoonStar,
   Plus,
   RefreshCw,
   Trash2,
@@ -95,7 +97,7 @@ export default function AdminPage() {
   </>;
 
   return <>
-    <PageHeader title="공지 관리" description="학생 화면에 표시할 공지와 첨부파일을 관리합니다." crumbs={[{ label: "홈", href: "/" }, { label: "관리자" }]} actions={<button type="button" onClick={() => { clearAdminPassword(); setAuthenticated(false); }} className="notion-button"><LogOut className="h-4 w-4" /> 로그아웃</button>} />
+    <PageHeader title="콘텐츠 관리" description="학급 공지와 야간자율학습 명단을 관리합니다." crumbs={[{ label: "홈", href: "/" }, { label: "관리자" }]} actions={<button type="button" onClick={() => { clearAdminPassword(); setAuthenticated(false); }} className="notion-button"><LogOut className="h-4 w-4" /> 로그아웃</button>} />
     {error && <p className="mb-5 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>}
     <section className="mb-8">
       <div className="mb-3 flex items-center justify-between gap-3">
@@ -125,13 +127,26 @@ export default function AdminPage() {
             처음 설정하는 순서
           </summary>
           <ol className="list-decimal space-y-2 border-t border-[#e6e6e6] px-8 py-4 text-sm leading-6 text-[#615d59]">
-            <li>Supabase SQL Editor에서 <b>20260610_public_class_hub.sql</b>과 <b>20260706_notice_image_position.sql</b>을 실행합니다.</li>
+            <li>Supabase SQL Editor에서 <b>20260610_public_class_hub.sql</b>, <b>20260706_notice_image_position.sql</b>, <b>20260828_evening_study.sql</b>을 실행합니다.</li>
             <li>Vercel Production 환경에 Supabase 서버 비밀 키와 관리자 비밀번호를 설정합니다.</li>
             <li>Vercel에서 최신 Production 배포를 다시 배포합니다.</li>
             <li>배포 후 이 화면에서 <b>다시 확인</b>을 누릅니다.</li>
           </ol>
         </details>
       )}
+    </section>
+    <section className="mb-8">
+      <div className="mb-3">
+        <h2 className="text-lg font-semibold">야간자율학습</h2>
+        <p className="mt-1 text-sm text-[#787774]">요일별 명단과 종료 차시, 운영 시간을 관리합니다.</p>
+      </div>
+      <Link href="/admin/evening-study" className="notion-card flex min-h-20 items-center justify-between gap-4 p-4 transition-colors hover:bg-[#fbfbfa]">
+        <span className="flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-md bg-[#e7f2fc] text-[#0075de]"><MoonStar className="h-5 w-5" /></span>
+          <span><span className="block text-sm font-semibold">명단 및 시간 수정</span><span className="mt-1 block text-xs text-[#787774]">월~금 기본 명단을 관리합니다.</span></span>
+        </span>
+        <ChevronRight className="h-4 w-4 shrink-0 text-[#a39e98]" />
+      </Link>
     </section>
     <section>
       <div className="mb-3 flex items-center justify-between gap-3">

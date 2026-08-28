@@ -41,6 +41,16 @@ export async function GET(request: NextRequest) {
   if (publicClient) {
     for (const table of [
       { id: "notices", label: "공지사항 테이블", name: "notices" },
+      {
+        id: "evening-study-settings",
+        label: "야간자율학습 시간 설정",
+        name: "evening_study_settings",
+      },
+      {
+        id: "evening-study-students",
+        label: "야간자율학습 명단",
+        name: "evening_study_students",
+      },
     ]) {
       const { error } = await publicClient.from(table.name).select("id").limit(1);
       checks.push({
@@ -48,12 +58,18 @@ export async function GET(request: NextRequest) {
         label: table.label,
         ok: !error,
         guidance: error
-          ? "Supabase SQL Editor에서 20260610_public_class_hub.sql을 실행하세요."
+          ? table.name.startsWith("evening_study")
+            ? "Supabase SQL Editor에서 20260828_evening_study.sql을 실행하세요."
+            : "Supabase SQL Editor에서 20260610_public_class_hub.sql을 실행하세요."
           : "",
       });
     }
   } else {
-    for (const table of [["notices", "공지사항 테이블"]]) {
+    for (const table of [
+      ["notices", "공지사항 테이블"],
+      ["evening-study-settings", "야간자율학습 시간 설정"],
+      ["evening-study-students", "야간자율학습 명단"],
+    ]) {
       checks.push({
         id: table[0],
         label: table[1],

@@ -2,6 +2,7 @@
 
 import { academicCalendarEvents } from "@/app/academic-calendar-data";
 import { CurrentPeriodCard } from "@/components/current-period-card";
+import { EveningStudyCard } from "@/components/evening-study-card";
 import { ExamFocusCard } from "@/components/exam-focus-card";
 import {
   NoticeImageIndicator,
@@ -14,6 +15,13 @@ import {
   isVisibleNotice,
   type Notice,
 } from "@/lib/content";
+import {
+  defaultEveningStudyData,
+  getEveningStudyGroups,
+  getEveningStudyOffReason,
+  getEveningStudyWeekday,
+  type EveningStudyData,
+} from "@/lib/evening-study";
 import {
   fetchMeals,
   formatMealAllergenWarning,
@@ -35,9 +43,13 @@ import { useEffect, useMemo, useState } from "react";
 
 export default function HomePage() {
   const today = getLocalDateString();
+  const now = useMemo(() => new Date(), []);
   const [meals, setMeals] = useState<Meal[]>([]);
   const [mealStatus, setMealStatus] = useState("급식 정보를 불러오는 중입니다.");
   const [notices, setNotices] = useState<Notice[]>([]);
+  const [eveningStudy, setEveningStudy] = useState<EveningStudyData>(
+    defaultEveningStudyData,
+  );
   const todayDate = useMemo(() => parseLocalDate(today), [today]);
   const examFocus = getExamFocus(academicCalendarEvents);
   const academicToday = academicCalendarEvents.filter((event) =>
@@ -49,6 +61,13 @@ export default function HomePage() {
   const important = notices.filter(
     (notice) => notice.is_important && isVisibleNotice(notice, today),
   );
+  const eveningWeekday = getEveningStudyWeekday(now);
+  const eveningGroups = eveningWeekday
+    ? getEveningStudyGroups(eveningStudy, eveningWeekday)
+    : getEveningStudyGroups(eveningStudy, "monday").map((group) => ({
+        ...group,
+        students: [],
+      }));
 
   useEffect(() => {
     fetchMeals(today)
@@ -63,6 +82,11 @@ export default function HomePage() {
     parseApiResponse<Notice[]>(fetch("/api/notices", { cache: "no-store" }))
       .then(setNotices)
       .catch(() => setNotices([]));
+    parseApiResponse<EveningStudyData>(
+      fetch("/api/evening-study", { cache: "no-store" }),
+    )
+      .then(setEveningStudy)
+      .catch(() => setEveningStudy(defaultEveningStudyData));
   }, [today]);
 
   return (
@@ -88,6 +112,25 @@ export default function HomePage() {
       <div className="mb-8">
         <CurrentPeriodCard />
       </div>
+
+      <section className="mb-8">
+        <SectionTitle
+          title="오늘의 야간자율학습"
+          action={
+            <Link
+              href="/school/evening-study"
+              className="text-sm font-medium text-[#0075de]"
+            >
+              요일별 명단
+            </Link>
+          }
+        />
+        <EveningStudyCard
+          groups={eveningGroups}
+          effectiveDate={eveningStudy.settings.effectiveDate}
+          offReason={getEveningStudyOffReason(now, academicCalendarEvents)}
+        />
+      </section>
 
       {important.length > 0 && (
         <section className="mb-8">

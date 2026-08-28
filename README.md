@@ -1,6 +1,6 @@
 # 해강고 2학년 10반 학급 안내 허브
 
-학생 로그인 없이 시간표, 급식, 공지, 학사일정, 평가·제출 일정과 2028 진로진학 자료를 확인하는 공개형 Next.js 사이트입니다. 담임은 사이드바 하단의 숨김 진입점으로 관리자 화면에 들어가 관리형 콘텐츠를 등록합니다.
+학생 로그인 없이 시간표, 급식, 공지, 학사일정, 야간자율학습 명단과 2028 진로진학 자료를 확인하는 공개형 Next.js 사이트입니다. 담임은 사이드바 하단의 숨김 진입점으로 관리자 화면에 들어가 공지와 야간자율학습 명단을 관리합니다.
 
 ## Local development
 
@@ -24,6 +24,7 @@ Supabase SQL Editor에서 [`supabase/migrations/20260610_public_class_hub.sql`](
 
 - [`supabase/migrations/20260611_student_tools.sql`](supabase/migrations/20260611_student_tools.sql): 고2 월별 로드맵
 - [`supabase/migrations/20260706_notice_image_position.sql`](supabase/migrations/20260706_notice_image_position.sql): 공지 사진 본문 표시 위치
+- [`supabase/migrations/20260828_evening_study.sql`](supabase/migrations/20260828_evening_study.sql): 야간자율학습 기본 명단, 요일별 종료 차시와 운영 시간
 
 학생 조회는 공개 RLS 정책을 사용하고 등록·수정·삭제·파일 업로드는 서버의 Service Role 키로 처리합니다.
 

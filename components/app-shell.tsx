@@ -13,6 +13,7 @@ import {
   GraduationCap,
   Home,
   Menu,
+  MoonStar,
   MapPinned,
   Newspaper,
   Search,
@@ -34,6 +35,7 @@ type NavItem = {
 const schoolItems: NavItem[] = [
   { href: "/school/timetable", label: "시간표", icon: Table2 },
   { href: "/school/meals", label: "급식", icon: Utensils },
+  { href: "/school/evening-study", label: "야간자율학습", icon: MoonStar },
   { href: "/school/calendar", label: "학사일정", icon: CalendarDays },
   { href: "/school/notices", label: "학급 공지사항", icon: Newspaper },
 ];
@@ -234,6 +236,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             { href: "/search", icon: Search, label: "검색" },
             { href: "/school/timetable", icon: Table2, label: "시간표" },
             { href: "/school/meals", icon: Utensils, label: "급식" },
+            { href: "/school/evening-study", icon: MoonStar, label: "야간자율학습" },
             { href: "/school/calendar", icon: CalendarDays, label: "학사일정" },
             { href: "/school/notices", icon: Newspaper, label: "공지" },
             { href: "/career/2028", icon: GraduationCap, label: "진로진학" },

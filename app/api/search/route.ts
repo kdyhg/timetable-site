@@ -21,6 +21,14 @@ const includes = (values: unknown[], query: string) =>
 
 const featurePages: Array<SearchResult & { keywords: string }> = [
   {
+    id: "feature-evening-study",
+    type: "학교생활",
+    title: "야간자율학습",
+    description: "오늘과 요일별 야간자율학습 참석 예정 명단을 확인합니다.",
+    href: "/school/evening-study",
+    keywords: "야자 야간자율학습 참석 명단 8교시 1차시 2차시",
+  },
+  {
     id: "feature-subjects-to-majors",
     type: "진로 탐색",
     title: "과목에서 학과 찾기",
